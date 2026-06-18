@@ -1,0 +1,13 @@
+{
+    "project_name": "Harness Engineering",
+    "language": "ko",
+    "deep_interview": {
+        "ambiguity_threshold": 0.05,
+        "max_rounds": 20,
+        "soft_warning_rounds": 10
+    },
+    "paths": {
+        "prd": "docs/product-specs/PRD.md",
+        "exec_plan_dir": "docs/exec-plans/active/"
+    }
+}
