@@ -75,6 +75,25 @@ The core consensus workflow operates as a sequential quality gate:
 
 **The finalized report overwrites/updates the dedicated plan at `docs/exec-plans/active/ep-{slug}.md` with a status label of `[Pending Approval]`.** The workflow then completely halts, presenting the full architecture feedback and verification report to the user, blocking any further automated actions or code file mutations.
 
+**Log Output:** After presenting the finalization report, write `evals/logs/latest.json`. This write is unconditional — it must happen even if consensus was not reached within the iteration limit.
+
+```json
+{
+  "skill": "ralplan",
+  "run_id": "run-{unix_timestamp}",
+  "started_at": "{ISO8601_UTC — start of ralplan invocation}",
+  "finished_at": "{ISO8601_UTC_now}",
+  "input_prompt": "/skill:ralplan {task_description_or_ep_path}",
+  "output_result": {
+    "exec_plan_path": "docs/exec-plans/active/ep-{slug}.md",
+    "validation_passed": "{true if Critic issued OKAY | false if iteration limit hit or REJECT}",
+    "iterations": "{integer — number of consensus loop iterations completed}",
+    "mutation_attempted": false
+  },
+  "eval_score": null
+}
+```
+
 ---
 
 ## Pre-Execution Gate (Redirect Path)

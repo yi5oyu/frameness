@@ -12,17 +12,24 @@
 ## 2. Progress & Milestones
 *타임스탬프를 사용하여 세부 단계를 추적합니다. 중간에 멈출 경우 완료(`done`)와 남은 작업(`remaining`)을 명확히 쪼개어 업데이트하세요.*
 
-- [ ] (YYYY-MM-DD HH:MMZ) 인터뷰 및 요구사항 정제 완료
-- [ ] 아키텍트 패널 교차 검증 통과
-- [ ] `qa` 스킬 기반 격리 테스트 코드 생성 완료
-- [ ] 인간 개발자 프로덕션 코드 구현 완료
+- [ ] (YYYY-MM-DD HH:MMZ) 인터뷰 및 요구사항 정제 완료 (`deep-interview`)
+- [ ] 아키텍트 패널 교차 검증 통과 (`ralplan`)
+- [ ] 격리 워크스페이스 생성 완료 (`using-git-worktrees`, 베이스라인 테스트 통과)
+- [ ] TDD 사이클 적용하며 구현 완료 (`execute` + `test-driven-development`)
+- [ ] Reviewer APPROVED (`review-report.md` 기준)
 - [ ] `qa` 최종 인수 테스트 통과 (`[QA PASSED]`)
 
 ## 3. Surprises & Discoveries
 - *구현 및 검증 과정에서 발견한 예상치 못한 버그, 라이브러리 제약, 최적화 기회 등을 증거 스니펫(에러 로그, 테스트 결과 등)과 함께 기록합니다.*
-- **발견:** ## 4. Decision Log (설계 결정 기록)
+- **발견:**
+
+## 4. Decision Log (설계 결정 기록)
 - *계획을 변경하거나 특정 기술 구조를 선택한 이유를 기록하여 기술 부채 트래커와 연동합니다.*
-- **Decision:** - **Rationale:** - **Date/Author:** ## 5. Context and Orientation (레포지토리 컨텍스트)
+- **Decision:**
+- **Rationale:**
+- **Date/Author:**
+
+## 5. Context and Orientation (레포지토리 컨텍스트)
 - 본 작업을 수행하기 위해 참조하거나 수정해야 하는 파일들의 **전체 상대 경로**를 명시합니다.
 - 예: `src/main/java/com/example/api/UserController.java`
 - 용어 정의: (예: 사용하는 특정 미들웨어나 커스텀 어노테이션의 의미를 기술)

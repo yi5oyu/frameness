@@ -1,0 +1,40 @@
+[
+  {
+    "id": "case-rp-001",
+    "description": "표준 실행 계획을 받아 1-pass consensus를 달성하고 [Pending Approval] 상태로 최종화하는지 검증",
+    "skill": "ralplan",
+    "tags": ["standard", "happy-path"],
+    "promoted_at": null,
+    "input_prompt": "docs/exec-plans/active/ep-20260618-feat-user-auth.md 플랜을 검증해줘.",
+    "expected_behavior": {
+      "min_loop_iterations": 1,
+      "stage_files_created": [
+        "docs/exec-plans/active/verification/stage-01-planner.md",
+        "docs/exec-plans/active/verification/stage-01-architect.md",
+        "docs/exec-plans/active/verification/stage-01-critic.md"
+      ],
+      "final_status": "Pending Approval",
+      "mutation_attempted": false
+    }
+  },
+  {
+    "id": "case-rp-002",
+    "description": "고위험 변경사항(auth/보안)에 대해 deliberate 모드가 자동 활성화되고 pre-mortem 3개 시나리오가 포함되는지 검증",
+    "skill": "ralplan",
+    "tags": ["deliberate", "high-risk", "security"],
+    "promoted_at": null,
+    "input_prompt": "기존 세션 기반 인증을 JWT로 전면 교체하는 계획을 검토해줘.",
+    "expected_behavior": {
+      "min_loop_iterations": 1,
+      "stage_files_created": [
+        "docs/exec-plans/active/verification/stage-01-planner.md",
+        "docs/exec-plans/active/verification/stage-01-architect.md",
+        "docs/exec-plans/active/verification/stage-01-critic.md"
+      ],
+      "deliberate_mode_activated": true,
+      "premortem_scenarios_count": 3,
+      "final_status": "Pending Approval",
+      "mutation_attempted": false
+    }
+  }
+]

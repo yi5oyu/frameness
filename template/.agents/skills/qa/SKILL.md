@@ -37,6 +37,18 @@ The QA skill is fundamentally a validation layer designed to protect the core pr
 
 ## QA Workflow Lifecycle
 
+### Phase 0: Settings & Init (Blocking Prerequisite)
+
+Before Step 1, read `.agents/settings.json` and extract:
+- `language` — apply to all user-facing output for this session.
+- `source_dirs` — used to verify that this skill does NOT write to production source directories.
+
+If `.agents/settings.json` is unreadable, proceed with default language `ko` and log the limitation.
+
+Record the session start timestamp as `qa_started_at` for the final eval log.
+
+---
+
 ### Step 1: Ingest Plan & Target Identification
 - Open and read the target execution plan (e.g., `docs/exec-plans/active/ep-{slug}.md`) and its referenced `PRD.md`.
 - Identify the core acceptance criteria, user paths, and mutated/new files mentioned in the plan.
@@ -55,6 +67,27 @@ The QA skill is fundamentally a validation layer designed to protect the core pr
 - Synthesize the execution outcomes into a structured markdown report.
 - **The finalized QA report MUST be written directly to: `docs/exec-plans/active/verification/qa-report-{slug}.md`.**
 - Mark the final status clearly as `[QA PASSED]` or `[QA FAILED]`. If failures occurred, include exact stack traces, failing components, and local paths to any captured error screenshots.
+
+### Step 5: Eval Log Output
+
+After writing the QA report, write `evals/logs/latest.json`. This write is unconditional — it must happen whether tests passed, failed, or were skipped.
+
+```json
+{
+  "skill": "qa",
+  "run_id": "run-{unix_timestamp}",
+  "started_at": "{qa_started_at}",
+  "finished_at": "{ISO8601_UTC_now}",
+  "input_prompt": "/skill:qa {flags} {exec_plan_path}",
+  "output_result": {
+    "test_files_written": ["{paths of test files written}"],
+    "report_path": "docs/exec-plans/active/verification/qa-report-{slug}.md",
+    "test_results": "{PASSED | FAILED | SKIPPED}",
+    "mutation_attempted": false
+  },
+  "eval_score": null
+}
+```
 
 ---
 

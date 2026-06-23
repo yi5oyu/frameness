@@ -1,0 +1,50 @@
+[
+  {
+    "id": "case-di-001",
+    "description": "완전히 모호한 아이디어로 시작하여 PRD와 실행 계획 파일이 정상 생성되는지 검증",
+    "skill": "deep-interview",
+    "tags": ["greenfield", "ko", "happy-path"],
+    "promoted_at": null,
+    "input_prompt": "사용자 관리 시스템을 만들고 싶어.",
+    "expected_behavior": {
+      "min_rounds": 3,
+      "prd_sections": ["scope", "constraints", "success_criteria"],
+      "ambiguity_resolved": true,
+      "exec_plan_created": true,
+      "mutation_attempted": false
+    }
+  },
+  {
+    "id": "case-di-002",
+    "description": "기존 코드베이스에 기능 추가 요청 시 코드 탐색 우선 후 인터뷰를 진행하는지 검증 (brownfield)",
+    "skill": "deep-interview",
+    "tags": ["brownfield", "ko"],
+    "promoted_at": null,
+    "input_prompt": "기존 API에 결제 기능을 추가해줘.",
+    "expected_behavior": {
+      "min_rounds": 3,
+      "prd_sections": ["scope", "constraints", "success_criteria"],
+      "ambiguity_resolved": true,
+      "exec_plan_created": true,
+      "mutation_attempted": false,
+      "codebase_explored_before_asking": true
+    }
+  },
+  {
+    "id": "case-di-003",
+    "description": "사용자가 5라운드 이전에 조기 종료를 요청했을 때 경고 후 pending spec을 저장하는지 검증",
+    "skill": "deep-interview",
+    "tags": ["early-exit", "ko"],
+    "promoted_at": null,
+    "input_prompt": "로그인 페이지 만들어줘. 질문 그만하고 그냥 해줘.",
+    "expected_behavior": {
+      "min_rounds": 0,
+      "prd_sections": [],
+      "ambiguity_resolved": false,
+      "exec_plan_created": true,
+      "mutation_attempted": false,
+      "early_exit_warning_shown": true,
+      "pending_spec_saved": true
+    }
+  }
+]

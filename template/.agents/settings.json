@@ -9,5 +9,6 @@
     "paths": {
         "prd": "docs/product-specs/PRD.md",
         "exec_plan_dir": "docs/exec-plans/active/"
-    }
+    },
+    "source_dirs": ["src", "lib", "app", "pages", "components"]
 }

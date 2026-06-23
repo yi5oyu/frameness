@@ -1,0 +1,38 @@
+[
+  {
+    "id": "case-ex-001",
+    "description": "표준 승인된 플랜으로 전체 파이프라인(Researcher→Planner→Gate→Implementer→Reviewer)이 순서대로 완료되는지 검증",
+    "skill": "execute",
+    "tags": ["happy-path", "standard"],
+    "promoted_at": null,
+    "input_prompt": "/skill:execute docs/exec-plans/active/ep-20260618-feat-user-auth.md",
+    "expected_behavior": {
+      "phases_completed": ["researcher", "planner", "implementer", "reviewer"],
+      "research_brief_created": true,
+      "ready_for_approval_label": true,
+      "implementation_log_created": true,
+      "review_report_created": true,
+      "reviewer_verdict": "APPROVED",
+      "aborted": false,
+      "mutation_attempted": true
+    }
+  },
+  {
+    "id": "case-ex-002",
+    "description": "승인 게이트에서 'abort' 입력 시 Phase 3 진입 없이 로그에 aborted=true가 기록되는지 검증",
+    "skill": "execute",
+    "tags": ["abort-gate", "gate-enforcement"],
+    "promoted_at": null,
+    "input_prompt": "/skill:execute docs/exec-plans/active/ep-20260618-feat-user-auth.md",
+    "expected_behavior": {
+      "phases_completed": ["researcher", "planner"],
+      "research_brief_created": true,
+      "ready_for_approval_label": true,
+      "implementation_log_created": false,
+      "review_report_created": false,
+      "reviewer_verdict": null,
+      "aborted": true,
+      "mutation_attempted": false
+    }
+  }
+]

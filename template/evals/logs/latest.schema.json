@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EvalLog",
+  "description": "에이전트 스킬 단일 실행 결과 로그. run-evals.py promote 명령이 latest.json을 읽어 골든 케이스로 승격한다.",
+  "type": "object",
+  "required": ["skill", "run_id", "started_at", "finished_at", "input_prompt", "output_result"],
+  "properties": {
+    "skill": {
+      "type": "string",
+      "enum": ["deep-interview", "ralplan", "qa", "execute"],
+      "description": "실행된 스킬 이름"
+    },
+    "run_id": {
+      "type": "string",
+      "description": "타임스탬프 기반 고유 실행 ID (예: run-1750200000)"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "실행 시작 시각 (ISO 8601 UTC)"
+    },
+    "finished_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "실행 완료 시각 (ISO 8601 UTC)"
+    },
+    "input_prompt": {
+      "type": "string",
+      "description": "에이전트에게 전달된 원본 프롬프트"
+    },
+    "output_result": {
+      "type": "object",
+      "description": "스킬 실행 후 에이전트가 기록한 구조화된 출력 요약",
+      "properties": {
+        "mutation_attempted": {
+          "type": "boolean",
+          "description": "소스 파일 직접 수정 시도 여부 (모든 스킬 공통)"
+        },
+        "ambiguity_resolved": {
+          "type": "boolean",
+          "description": "[deep-interview 전용] 최종 모호도 임계값 통과 여부"
+        },
+        "prd_path": {
+          "type": "string",
+          "description": "[deep-interview 전용] 생성된 PRD 파일 경로"
+        },
+        "exec_plan_path": {
+          "type": "string",
+          "description": "[deep-interview/ralplan 전용] 생성/수정된 ep-*.md 경로"
+        },
+        "validation_passed": {
+          "type": "boolean",
+          "description": "[ralplan 전용] Critic OKAY 합의 도달 여부 (false = 이터레이션 한도 초과 또는 REJECT)"
+        },
+        "iterations": {
+          "type": "integer",
+          "description": "[ralplan 전용] 합의 루프 반복 횟수"
+        },
+        "rounds": {
+          "type": "integer",
+          "description": "[deep-interview 전용] 수행된 인터뷰 라운드 수"
+        },
+        "test_files_written": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "[qa 전용] 생성된 테스트 파일 경로 목록"
+        },
+        "report_path": {
+          "type": "string",
+          "description": "[qa 전용] QA 리포트 파일 경로"
+        },
+        "files_mutated": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "[execute 전용] 실제 변경된 파일 경로 목록"
+        },
+        "files_mutated_count": {
+          "type": "integer",
+          "description": "[execute 전용] 변경된 파일 수"
+        },
+        "phases_completed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "[execute 전용] 실제 실행된 페이즈 목록 (researcher, planner, implementer, reviewer)"
+        },
+        "reviewer_verdict": {
+          "type": ["string", "null"],
+          "enum": ["APPROVED", "NEEDS_REVISION", null],
+          "description": "[execute 전용] Reviewer 판정. abort 시 null"
+        },
+        "risk_level": {
+          "type": ["string", "null"],
+          "enum": ["LOW", "MEDIUM", "HIGH", null],
+          "description": "[execute 전용] Researcher가 산정한 위험 수준"
+        },
+        "test_results": {
+          "type": ["string", "null"],
+          "enum": ["PASSED", "FAILED", "SKIPPED", null],
+          "description": "[execute/qa 전용] 테스트 실행 결과"
+        },
+        "aborted": {
+          "type": "boolean",
+          "description": "[execute 전용] 인간 승인 게이트에서 abort 입력 여부"
+        }
+      }
+    },
+    "eval_score": {
+      "type": ["number", "null"],
+      "description": "run-evals.py run 채점 후 채워지는 0.0~1.0 점수. 채점 전은 null."
+    }
+  }
+}

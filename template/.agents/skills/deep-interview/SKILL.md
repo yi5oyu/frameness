@@ -1,7 +1,7 @@
 ---
 name: deep-interview
 description: Socratic deep interview with mathematical ambiguity gating and ralplan validation before explicit execution approval
-argument-hint: "[--quick|--standard|--deep] <idea or vague description>"
+argument-hint: "[--fresh] [--quick|--standard|--deep] <idea or vague description>"
 pipeline: [deep-interview, exec-plan, ralplan]
 handoff-policy: approval-required
 handoff: 
@@ -454,11 +454,33 @@ Upon passing both gates, the agent utilizes the local workspace file system laye
 
 After the specification (`docs/product-specs/PRD.md`) and execution plan (`docs/exec-plans/active/ep-{slug}.md`) are successfully crystallized, the deep-interview skill terminates further file mutation. The deep-interview agent operates strictly as a requirements gathering and planning agent; it is forbidden from executing source code mutations, running deployment commands, or modifying files inside product source branches.
 
-### 1. Dashboard Registration
+### 1. Eval Log Output
+
+Before any further actions, write `evals/logs/latest.json`. This write is unconditional — it must happen whether the interview reached the threshold, hit the hard cap, or exited early.
+
+```json
+{
+  "skill": "deep-interview",
+  "run_id": "run-{unix_timestamp}",
+  "started_at": "{ISO8601_UTC — recorded at Phase 0 start}",
+  "finished_at": "{ISO8601_UTC_now}",
+  "input_prompt": "{initial_idea_summary — prompt-safe, max 200 chars}",
+  "output_result": {
+    "ambiguity_resolved": "{true if threshold met | false if early-exit or hard-cap}",
+    "prd_path": "docs/product-specs/PRD.md",
+    "exec_plan_path": "docs/exec-plans/active/ep-{slug}.md",
+    "rounds": "{integer — total rounds completed}",
+    "mutation_attempted": false
+  },
+  "eval_score": null
+}
+```
+
+### 2. Dashboard Registration
 
 Before prompting the user for the next phase, the agent must update the root `PLANS.md` dashboard file. It registers the newly created execution plan task under a `[Pending Validation]` status, ensuring workspace visibility.
 
-### 2. Present Routing Options
+### 3. Present Routing Options
 
 The agent presents the final pipeline execution options to the user using the workspace interaction layer, preserving clarity and target localization:
 
@@ -597,6 +619,8 @@ Optional settings in `.agents/settings.json`:
 ## Resume
 
 If interrupted, invoking this deep-interview skill again will parse `.agents/state.json`. If `"active": true` is found, the agent resumes the transcript, loads established facts, and preserves the historical ontology snapshot without re-running Phase 0 or Round 0.
+
+If the `--fresh` flag is passed, ignore any existing `.agents/state.json` (even if `"active": true`) and begin a completely new interview from Phase 0. The previous state file is overwritten at the end of Phase 1 initialization.
 
 ## Pipeline Routing: deep-interview → ralplan → pending approval
 

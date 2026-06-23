@@ -1,0 +1,34 @@
+[
+  {
+    "id": "case-qa-001",
+    "description": "백엔드 로직 변경에 대해 기존 테스트 프레임워크(Jest/PyTest)를 탐지하여 유닛 테스트를 생성하는지 검증",
+    "skill": "qa",
+    "tags": ["unit", "backend"],
+    "promoted_at": null,
+    "input_prompt": "/skill:qa --unit docs/exec-plans/active/ep-20260618-feat-user-auth.md",
+    "expected_behavior": {
+      "test_files_created": true,
+      "test_dirs": ["tests/", "src/__tests__/"],
+      "report_written": true,
+      "report_path_pattern": "docs/exec-plans/active/verification/qa-report-*.md",
+      "result_status_present": true,
+      "mutation_attempted": false
+    }
+  },
+  {
+    "id": "case-qa-002",
+    "description": "UI 변경사항에 대해 Playwright E2E 시나리오를 생성하고 브라우저 실행 후 리포트를 작성하는지 검증",
+    "skill": "qa",
+    "tags": ["e2e", "frontend", "playwright"],
+    "promoted_at": null,
+    "input_prompt": "/skill:qa --e2e docs/exec-plans/active/ep-20260618-feat-login-ui.md",
+    "expected_behavior": {
+      "test_files_created": true,
+      "test_dirs": ["playwright/", "cypress/", "tests/"],
+      "report_written": true,
+      "report_path_pattern": "docs/exec-plans/active/verification/qa-report-*.md",
+      "result_status_present": true,
+      "mutation_attempted": false
+    }
+  }
+]
