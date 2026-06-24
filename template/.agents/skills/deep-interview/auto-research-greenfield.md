@@ -37,6 +37,8 @@ Rules:
 * `rank` starts at 1 and increases by 1.
 * `confidence` must be `high`, `medium`, or `low`.
 * Every rationale must cite inherited context, confirmed constraints, or repo facts available in the prompt.
+* **If the question concerns a language, framework, library, runtime, or build tool**, every `answer` string MUST include a concrete version or version range plus the build/package tool, e.g. `"Spring Boot 3.x (3.3 LTS) + Gradle"` or `"Java 21 (LTS)"`. Never return a bare technology name with no version (e.g. plain `"Spring Boot"`) — name the current stable/LTS release(s) you are aware of, and mark `confidence: low` if you are not certain which version is current rather than guessing silently.
+* **If the question concerns code style / linting / formatting for a language or framework already locked in this session**, every `answer` string MUST name a concrete style guide plus its linter and formatter, e.g. `"Google Java Style — Checkstyle (google_checks.xml) + google-java-format"` or `"Airbnb — ESLint (eslint-config-airbnb) + Prettier"`. Never return a vague answer like `"use a linter"` with no named convention.
 
 ## Fallback
 

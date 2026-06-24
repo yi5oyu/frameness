@@ -67,7 +67,7 @@ def score(case: dict[str, Any], log: dict[str, Any], project_root: str) -> dict[
                   f"[Ready for Approval]={'존재' if ready_label_ok else '없음'}",
     }
 
-    # 2. 인간 승인 게이트 준수 여부
+    # 2. 검증 확인 필요 단계 준수 여부
     # - aborted=True인 케이스는 implementation_log가 없어야 정상 (게이트가 지켜진 것)
     # - aborted=False인 케이스는 approved=True가 로그에 있어야 정상
     aborted_in_log        = bool(output.get("aborted", False))

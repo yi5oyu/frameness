@@ -50,6 +50,8 @@ Role agents (`planner`, `architect`, and `critic`) save their long-form evaluati
 
 The core consensus workflow operates as a sequential quality gate:
 
+0. **Init (blocking prerequisite)**: Read `.agents/settings.json` for `language` and read `.agents/rules/global.md` for the global anti-pattern/error-handling rules that apply to every role (Planner, Architect, Critic) in this session — relying on host auto-injection alone is not guaranteed, so this skill reads it explicitly. If either file is missing, proceed with default language `ko` and note the limitation in the final report.
+
 1. **Planner (Drafting & Rationale)**: Creates the initial plan and a compact **RALPLAN-DR summary** containing:
 * Core Principles (3 to 5)
 * Top 3 Decision Drivers
@@ -59,7 +61,7 @@ The core consensus workflow operates as a sequential quality gate:
 
 2. **User Feedback Check** *(--interactive only)*: Presents the draft plan and the Principles/Drivers/Options summary to the user via the `ask` tool. The user can choose to proceed to architecture review, request direct adjustments, or skip review.
 
-3. **Architect (Soundness Review)**: Conducts a rigorous architectural evaluation. The Architect MUST provide a strong steelman antithesis to the planner's assumptions, highlight at least one real tradeoff tension, and verify compliance with `ARCHITECTURE.md` and `docs/design-docs/adr/core-beliefs.md`.
+3. **Architect (Soundness Review)**: Conducts a rigorous architectural evaluation. The Architect MUST provide a strong steelman antithesis to the planner's assumptions, highlight at least one real tradeoff tension, and verify compliance with `ARCHITECTURE.md` and `docs/design-docs/core-beliefs.md`.
 *Persisted to `docs/exec-plans/active/verification/stage-<NN>-architect.md*`. Returns a compact verdict: `CLEAR`, `WATCH`, or `BLOCK`.
 
 4. **Critic (Quality & Verification Gate)**: Evaluates the plan against strict quality criteria after Step 3 completes. Ensures principle-option consistency, fair alternative mapping, testable acceptance criteria, and explicit validation metrics.
@@ -84,6 +86,8 @@ The core consensus workflow operates as a sequential quality gate:
   "started_at": "{ISO8601_UTC — start of ralplan invocation}",
   "finished_at": "{ISO8601_UTC_now}",
   "input_prompt": "/skill:ralplan {task_description_or_ep_path}",
+  "model": "{현재 세션에 사용 중인 모델 ID. 확인 불가 시 null}",
+  "token_usage": "{세션이 노출하는 input_tokens/output_tokens/total_tokens. 확인 불가 시 null}",
   "output_result": {
     "exec_plan_path": "docs/exec-plans/active/ep-{slug}.md",
     "validation_passed": "{true if Critic issued OKAY | false if iteration limit hit or REJECT}",

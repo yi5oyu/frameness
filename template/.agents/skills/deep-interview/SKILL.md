@@ -101,6 +101,8 @@ Deep Interview threshold: <resolvedThresholdPercent> (source: <resolvedThreshold
 * Substitute `<resolvedThreshold>`, `<resolvedThresholdPercent>`, and `<resolvedThresholdSource>` throughout the remaining instructions before continuing.
 * Maintain the session language according to the parsed language configuration (e.g., `ko` for Korean session responses) to avoid mixing languages.
 
+5. **Read global rules explicitly**: Read `.agents/rules/global.md` (language/anti-pattern/error-handling rules that should color the PRD's constraints and the eventual `## Code Style & Tooling` decisions) — do not rely solely on host auto-injection from its frontmatter `trigger`.
+
 ## Phase 1: Initialize
 
 1. **Parse the user's idea**:
@@ -115,7 +117,7 @@ Deep Interview threshold: <resolvedThresholdPercent> (source: <resolvedThreshold
 
 3. **For brownfield context assembly**:
 * Run workspace exploration tools to map relevant codebase areas and store them as `codebase_context`.
-* Read local planning and architectural constraints: read `ARCHITECTURE.md` and `docs/design-docs/adr/core-beliefs.md` to capture domain facts and prior decisions.
+* Read local planning and architectural constraints: read `ARCHITECTURE.md` and `docs/design-docs/core-beliefs.md` to capture domain facts and prior decisions.
 * Use this context to avoid asking questions about facts the codebase or architecture documents already reveal.
 
 
@@ -234,6 +236,8 @@ Build the question generation prompt with:
 ### Step 2a′: Auto-Research Greenfield Questions
 
 * When the next question is for a greenfield interview and tagged `research: true`, load `.agents/skills/deep-interview/auto-research-greenfield.md` internally as a read-only fragment to provide 2-3 ranked tech candidates as concise answer choices or context for the single user-facing question. Log the round in `auto_researched_rounds`.
+* **Version specificity for tech stack questions:** If the question concerns a language, framework, library, runtime, or build tool, every candidate answer (and the eventual recorded decision in `## Tech Stack`) MUST name a concrete version or version range and the build/package tool — e.g., "Spring Boot 3.x (3.3 LTS) + Gradle", not bare "Spring Boot". Never let the agent pick an arbitrary version silently: surface the current stable/LTS option(s) via auto-research, then route the final confirmation to the user as a decision.
+* **Code style follows immediately after each tech stack decision:** As soon as a language/framework choice is locked into `## Tech Stack`, raise its style guide / linter / formatter as the next (or same-round) question rather than deferring it — e.g., locking in Java triggers a style question naming concrete candidates like "Google Java Style + Checkstyle" vs "Sun/Oracle conventions". Record the confirmed choice in `## Code Style & Tooling`. Do not leave this implicit or default it silently; it is a decision, not a fact, so it is routed to the user (auto-research may supply the candidate names).
 
 ### Step 2b: Ask the Question
 
@@ -423,6 +427,22 @@ Upon passing both gates, the agent utilizes the local workspace file system laye
 |---------------------|--------------------|------------------------|
 | {hidden assumption} | {how it was exposed} | {agreed design resolution} |
 
+## Tech Stack
+| Layer | Choice | Version | Build / Package Tool | Decision Source |
+|-------|--------|---------|------------------------|------------------|
+| {e.g. Backend Framework} | {e.g. Spring Boot} | {concrete version, e.g. "3.x (3.3 LTS 기준)" — never a bare major name without a version} | {e.g. Gradle} | {User-confirmed \| Researched-default (auto-research-greenfield) \| Existing codebase (brownfield)} |
+| {e.g. Language/Runtime} | {e.g. Java} | {e.g. "21 (LTS)"} | - | {decision source} |
+
+*규칙: 각 행의 `Version`은 임의로 비워두거나 메이저 이름만 적지 않는다. 그린필드는 `auto-research-greenfield.md`가 제시한 후보(현재 안정/LTS 버전 + 빌드 도구)를 사용자가 확정한 값을, 브라운필드는 기존 코드베이스에서 탐지한 실제 버전을 기록한다.*
+
+## Code Style & Tooling
+| Layer | Style Guide / Convention | Linter | Formatter | Decision Source |
+|-------|---------------------------|--------|-----------|------------------|
+| {e.g. Backend (Java)} | {e.g. Google Java Style} | {e.g. Checkstyle (google_checks.xml)} | {e.g. google-java-format} | {User-confirmed \| Researched-default (auto-research-greenfield) \| Existing codebase (brownfield)} |
+| {e.g. Frontend (TS/React)} | {e.g. Airbnb} | {e.g. ESLint (eslint-config-airbnb)} | {e.g. Prettier} | {decision source} |
+
+*규칙: 각 레이어/언어가 `## Tech Stack`에서 확정되면, 같은 라운드 또는 바로 다음 라운드에서 그 언어의 스타일 가이드·린터·포맷터를 함께 결정한다 — "나중에 정한다"로 비워두지 않는다. 그린필드는 `auto-research-greenfield.md`가 제시한 그 언어 생태계의 주류 컨벤션(예: Java → Google Style vs Sun/Oracle, JS/TS → Airbnb vs Standard) 중 사용자가 확정한 값을, 브라운필드는 기존 설정 파일(`.eslintrc`, `checkstyle.xml`, `.editorconfig` 등)에서 탐지한 실제 값을 기록한다.*
+
 ## Technical Context & Ontology
 ### Codebase Findings
 {Brownfield exploration findings, file system patterns, and architecture citations}
@@ -465,6 +485,8 @@ Before any further actions, write `evals/logs/latest.json`. This write is uncond
   "started_at": "{ISO8601_UTC — recorded at Phase 0 start}",
   "finished_at": "{ISO8601_UTC_now}",
   "input_prompt": "{initial_idea_summary — prompt-safe, max 200 chars}",
+  "model": "{현재 세션에 사용 중인 모델 ID. 확인 불가 시 null}",
+  "token_usage": "{세션이 노출하는 input_tokens/output_tokens/total_tokens. 확인 불가 시 null}",
   "output_result": {
     "ambiguity_resolved": "{true if threshold met | false if early-exit or hard-cap}",
     "prd_path": "docs/product-specs/PRD.md",
@@ -476,11 +498,34 @@ Before any further actions, write `evals/logs/latest.json`. This write is uncond
 }
 ```
 
-### 2. Dashboard Registration
+### 2. Guardrail Bootstrap (Greenfield Only)
+
+Before registering anything in `PLANS.md` and before any `ralplan` handoff, check whether the root/ADR guardrail files are still the unpopulated shipped skeleton. `ralplan`'s Architect stage validates new plans against both `ARCHITECTURE.md` AND `docs/design-docs/core-beliefs.md` — empty versions of either make that check meaningless, so a first-run greenfield project must bootstrap both now, from this session's own PRD, before validation can mean anything.
+
+* **Skip condition (brownfield):** If a given file already has real content beyond its bare header line, do not touch it — existing content takes precedence over this session's PRD. This skip rule is evaluated independently per file (`ARCHITECTURE.md`, `docs/design-docs/core-beliefs.md`, `AGENTS.md`).
+* **Bootstrap `ARCHITECTURE.md` (greenfield):** If every section is empty (header only, no body), populate it directly from the just-crystallized `PRD.md`:
+  - `## 1. Project Structure` ← top-level directories implied by the `Scope Topology` components.
+  - `## 3. Core Components` → `### 3.1 Frontend` / `### 3.2 Backend` ← one line per relevant `## Tech Stack` row, written as prose: `{Choice} {Version}, built with {Build/Package Tool}`.
+  - `## 4. Data Stores` ← any persistence/datastore rows from `## Tech Stack` or entities in `## Domain Entities (Key Ontology)` that imply storage.
+  - `## 5. External Integrations / APIs` ← any third-party services or APIs the interview surfaced.
+  - Leave `## 2. High-Level System Diagram`, `## 6. Deployment & Infrastructure`, and `## 7. Security Considerations` as an explicit placeholder line (e.g. `_추가 정보 필요 — 다음 ralplan 또는 execute 세션에서 보강_`) if the interview never established enough detail to fill them. **Never fabricate specifics the interview did not establish.**
+* **Bootstrap `docs/design-docs/core-beliefs.md` (greenfield):** If the file is still just the `# Core Beliefs` header with no body, derive a numbered list of guiding principles from this session's PRD — each entry one sentence stating the principle plus a one-line rationale, sourced only from material the interview actually produced:
+  - One entry per `## Core Requirements & Constraints` → `### Strict Constraints` item.
+  - One entry per `### Explicit Non-Goals` item, phrased as a boundary belief (e.g. "이 프로젝트는 {X}를 다루지 않는다 — {non-goal rationale}").
+  - One entry per non-trivial `## Tech Stack` decision whose `Rationale` reflects a deliberate tradeoff (not just "선택됨"), phrased as a technical belief.
+  - Do not invent principles the interview never discussed — if constraints/non-goals were sparse, the list is short. A short, honest list beats a padded, fabricated one.
+* **Bootstrap `AGENTS.md` (greenfield):**
+  - If `## Project Overview` is empty, fill it with a one- to two-sentence summary derived from the PRD's `Restated Goal`.
+  - If `### LLM-friendly References` is empty, fill it with baseline pointers that already exist after this session: links to `docs/product-specs/PRD.md`, `ARCHITECTURE.md`, `docs/design-docs/core-beliefs.md`, and `docs/exec-plans/active/ep-{slug}.md`. Do not invent additional references.
+  - **Do not write style/testing content into `AGENTS.md` itself.** `## Code style` and `## Testing instructions` ship as fixed pointers (to `.agents/rules/global.md` / PRD's `## Code Style & Tooling`, and to `.agents/rules/persona-qa.md` respectively) — AGENTS.md is a map, not a content store, so these sections need no per-project bootstrap.
+* **Push confirmed code style into the enforcement layer:** `.agents/rules/*.md` is the layer actually auto-injected into every agent's runtime context — a decision sitting only in `PRD.md` has no teeth until it lands there. For each row in `## Code Style & Tooling`, append one line to `.agents/rules/global.md` under a `## Project Tech Stack Style` heading (create the heading if absent): `- {Layer}: {Style Guide} — {Linter} + {Formatter}`. Skip rows that are already present verbatim (idempotent on re-runs).
+* This is a documentation-only write to root/ADR/rules markdown guardrail files, not a source mutation, so it is permitted in this phase.
+
+### 3. Dashboard Registration
 
 Before prompting the user for the next phase, the agent must update the root `PLANS.md` dashboard file. It registers the newly created execution plan task under a `[Pending Validation]` status, ensuring workspace visibility.
 
-### 3. Present Routing Options
+### 4. Present Routing Options
 
 The agent presents the final pipeline execution options to the user using the workspace interaction layer, preserving clarity and target localization:
 
@@ -489,7 +534,7 @@ The agent presents the final pipeline execution options to the user using the wo
 **Options:**
 
 1. **Validate with `ralplan` consensus loop (Highly Recommended)**
-* **Description:** Invoke the local `.agents/skills/ralplan/SKILL.md` skill to evaluate the generated plan against `docs/product-specs/PRD.md`, `ARCHITECTURE.md`, and `docs/design-docs/adr/core-beliefs.md`. This triggers a structured Planner ➡️ Architect ➡️ Critic review loop to expose dependencies and architectural risks before explicit execution.
+* **Description:** Invoke the local `.agents/skills/ralplan/SKILL.md` skill to evaluate the generated plan against `docs/product-specs/PRD.md`, `ARCHITECTURE.md`, and `docs/design-docs/core-beliefs.md`. This triggers a structured Planner ➡️ Architect ➡️ Critic review loop to expose dependencies and architectural risks before explicit execution.
 * **Action:** Upon explicit user selection, hand off session context to the local `ralplan` module and transition into the validation workflow.
 
 
@@ -597,6 +642,9 @@ Why good: An ontology-style question stabilizes the core noun before drilling in
 * [ ] Interview reached ambiguity ≤ threshold OR an explicit early exit with warning was executed.
 * [ ] Product specification persisted to `docs/product-specs/PRD.md` and execution plan draft persisted to `docs/exec-plans/active/ep-{slug}.md` exactly.
 * [ ] Spec metadata includes the auto/lateral counters (`auto_researched_rounds`, `auto_answered_rounds`, `lateral_reviews`, `refined_rounds`, `architect_failures`, `lateral_panel_failures`).
+* [ ] Each `## Tech Stack` language/framework decision has a matching `## Code Style & Tooling` row (style guide + linter + formatter) confirmed in the same or next round — never left for later.
+* [ ] `ARCHITECTURE.md`, `docs/design-docs/core-beliefs.md`, and `AGENTS.md` (Project Overview + LLM-friendly References only) checked: bootstrapped from the PRD if still an empty skeleton, left untouched if any already had real content.
+* [ ] Confirmed `## Code Style & Tooling` rows pushed into `.agents/rules/global.md` under `## Project Tech Stack Style` — not duplicated into `AGENTS.md`.
 * [ ] Execution and validation bridge presented via interaction choices; handoff to `.agents/skills/ralplan/SKILL.md` executed only after explicit user approval.
 </Final_Checklist>
 
@@ -639,7 +687,7 @@ Output: PRD.md & ep-*.md   Output: Validated Plan           Output: Safe Executi
 **Why 3 stages?** Each stage provides a different quality gate:
 
 1. **Deep Interview** gates on *clarity* — does the user know what they want? Output is saved directly to `docs/product-specs/PRD.md` and `docs/exec-plans/active/ep-*.md`.
-2. **ralplan consensus** gates on *feasibility* — is the execution plan architecturally sound against `ARCHITECTURE.md` and `docs/design-docs/adr/core-beliefs.md`?
+2. **ralplan consensus** gates on *feasibility* — is the execution plan architecturally sound against `ARCHITECTURE.md` and `docs/design-docs/core-beliefs.md`?
 3. **Separate approval** gates on *consent* — the workspace stops at a pending approval state, ensuring no automated source code mutations happen without human intervention.
 
 ## Brownfield vs Greenfield Weights

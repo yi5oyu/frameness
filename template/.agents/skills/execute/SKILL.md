@@ -1,6 +1,6 @@
 ---
 name: execute
-description: Structured implementation pipeline that enforces Researcher → Planner → Human Approval Gate → Implementer → Reviewer → Log in a single AI session with artifact-gated phase transitions
+description: Structured implementation pipeline that enforces Researcher → Planner → Verification Gate → Implementer → Reviewer → Log in a single AI session with artifact-gated phase transitions
 argument-hint: "<path to ep-*.md>"
 pipeline: [researcher, planner, human-gate, implementer, reviewer, log]
 handoff-policy: approval-required
@@ -11,7 +11,7 @@ source: "Designed for Agent Harness — completes the deep-interview → ralplan
 ---
 
 <Purpose>
-Execute is the implementation layer of the Agent Harness pipeline. It takes a `ralplan`-validated execution plan (`ep-*.md` with a `[Pending Approval]` label) and drives it to completion through a strictly ordered, artifact-gated sequence of roles — Researcher, Planner, Human Approval Gate, Implementer, and Reviewer — within a single AI session. Every phase transition is locked behind a concrete file artifact. The Implementer is the only phase permitted to mutate source files. The Reviewer is read-only by definition. The session concludes by writing a structured result to `evals/logs/latest.json`.
+Execute is the implementation layer of the Agent Harness pipeline. It takes a `ralplan`-validated execution plan (`ep-*.md` with a `[Pending Approval]` label) and drives it to completion through a strictly ordered, artifact-gated sequence of roles — Researcher, Planner, Verification Gate, Implementer, and Reviewer — within a single AI session. Every phase transition is locked behind a concrete file artifact. The Implementer is the only phase permitted to mutate source files. The Reviewer is read-only by definition. The session concludes by writing a structured result to `evals/logs/latest.json`.
 </Purpose>
 
 <Use_When>
@@ -30,12 +30,12 @@ Execute is the implementation layer of the Agent Harness pipeline. It takes a `r
 <Why_This_Exists>
 `deep-interview` produces clarity. `ralplan` produces architectural consensus. But neither implements anything. Without a structured execution layer, the harness pipeline terminates at a plan document and relies on unguided ad-hoc coding — which reintroduces exactly the chaos the harness is designed to prevent.
 
-Execute solves this by applying the same phase-gate discipline to implementation that `deep-interview` applies to requirements and `ralplan` applies to architecture. The Human Approval Gate specifically addresses the "AI proceeding without confirmation" failure mode, which is the most common cause of unexpected scope creep.
+Execute solves this by applying the same phase-gate discipline to implementation that `deep-interview` applies to requirements and `ralplan` applies to architecture. The Verification Gate specifically addresses the "AI proceeding without confirmation" failure mode, which is the most common cause of unexpected scope creep.
 </Why_This_Exists>
 
 <Execution_Policy>
 - **Never skip a phase.** Each phase has a mandatory artifact. The next phase MUST NOT begin until the current phase's artifact exists on disk.
-- **The Human Approval Gate is absolute.** After outputting the approval block, the agent calls zero tools. The only valid continuation signals are `approved`, `lgtm` (case-insensitive), or `abort`. Any other input triggers gate re-display. The agent never self-approves.
+- **The Verification Gate is absolute.** After outputting the approval block, the agent calls zero tools. The only valid continuation signals are `approved`, `lgtm` (case-insensitive), or `abort`. Any other input triggers gate re-display. The agent never self-approves.
 - **The Implementer is the only phase that may write source files.** All other phases are read-only or restricted to documentation paths.
 - **The Reviewer never fixes.** If the Reviewer finds blockers, it records them and closes the session with `NEEDS_REVISION`. It does not re-enter the Implementer phase.
 - **Every source file mutation is logged immediately** to `implementation-log.md` before moving to the next step. No batch-logging after the fact.
@@ -45,21 +45,9 @@ Execute solves this by applying the same phase-gate discipline to implementation
 </Execution_Policy>
 
 <Phase_Tool_Allowlist>
-Each phase restricts which tool categories are permitted. Calling a forbidden tool during a phase is a Phase Violation and must be announced immediately before halting.
-
-| Phase | File Reads | File Writes (docs only) | File Writes (source) | run_command | Browser |
-|-------|------------|------------------------|----------------------|-------------|---------|
-| Phase 0: Init | ✅ | ✅ (execute-state.json) | ❌ | ❌ | ❌ |
-| Phase 1: Researcher | ✅ | ✅ (execute-state.json) | ❌ | ❌ | ❌ |
-| Phase 2: Planner | ✅ | ✅ (ep-*.md, execute-state.json) | ❌ | ❌ | ❌ |
-| GATE | ❌ | ✅ (execute-state.json) | ❌ | ❌ | ❌ |
-| Phase 3: Implementer | ✅ | ✅ | ✅ | ✅ (build/lint only) | ❌ |
-| Phase 4: Reviewer | ✅ | ✅ (review-report.md, execute-state.json) | ❌ | ✅ (test runners only) | ❌ |
-| Phase 4.5: Walkthrough | ✅ | ✅ (walkthrough-*.md, execute-state.json) | ❌ | ❌ | ❌ |
-| Phase 5: Log | ✅ | ✅ (evals/logs/latest.json only) | ❌ | ❌ | ❌ |
+Each phase restricts which tool categories are permitted. Calling a forbidden tool during a phase is a Phase Violation and must be announced immediately before halting. The exact allowlist per phase is declared once, inline, at the start of that phase's section under `<Steps>` (no separate table here — see each phase's **허용 도구** / **금지 도구** lines).
 
 "Source" = any file under directories listed in `settings.json source_dirs` (resolved in Phase 0; defaults: `src/`, `lib/`, `app/`, `pages/`, `components/`).
-"Docs only" = `docs/exec-plans/active/verification/`, the target `ep-*.md`, and `execute-state.json`.
 </Phase_Tool_Allowlist>
 
 <Violation_Protocol>
@@ -76,7 +64,7 @@ If the agent detects it has violated a phase boundary rule, it must:
 4. Resume from the beginning of the current phase
 
 Critical Violations (no recovery — session terminates):
-- AI self-approving the Human Approval Gate
+- AI self-approving the Verification Gate
 - Implementer modifying files not listed in the execution plan
 - Reviewer modifying source files
 </Violation_Protocol>
@@ -86,6 +74,9 @@ Critical Violations (no recovery — session terminates):
 <Steps>
 
 ## Phase 0: Init (Blocking Prerequisite)
+
+**허용 도구:** 파일 읽기, `execute-state.json` 쓰기
+**금지 도구:** 소스 파일 쓰기, run_command, 브라우저
 
 This phase must complete fully before Phase 1 begins. Do not announce Phase 1 until all checks below pass.
 
@@ -100,6 +91,8 @@ If `.agents/settings.json` is missing or unparseable, halt with:
 ```
 ❌ [execute] .agents/settings.json을 읽을 수 없습니다. 스킬을 종료합니다.
 ```
+
+Also read `.agents/rules/global.md` (global anti-patterns/error-handling — applies to every line the Implementer writes) and `.agents/rules/persona-execute.md` (this skill's own role-boundary/gate rules) explicitly here; do not rely solely on host auto-injection from their frontmatter `trigger`.
 
 ### 0-2. Validate target plan
 
@@ -149,8 +142,8 @@ Output to user:
 
 ## Phase 1: Researcher
 
-**허용 도구:** 파일 읽기, grep_search, list_dir
-**금지 도구:** 모든 쓰기, run_command, 브라우저
+**허용 도구:** 파일 읽기, grep_search, list_dir, `research-brief.md`/`execute-state.json` 쓰기
+**금지 도구:** 그 외 모든 쓰기 (소스 파일 포함), run_command, 브라우저
 
 ### 1-1. Read the execution plan in full
 
@@ -255,14 +248,15 @@ Update the target `ep-*.md`:
 ```
 ✅ [Phase 2: Planner] 완료
    계획 정제 완료: [Ready for Approval] 레이블 부여
-   → 인간 승인 게이트 진입
+   → 검증 확인 필요 단계 진입
 ```
 
 ---
 
-## GATE: 인간 승인
+## GATE: 검증 확인 필요
 
-**이 구간에서 도구 호출은 절대 금지입니다.**
+**허용 도구:** 파일 읽기 (GATE-1 사전조건 확인), `execute-state.json` 쓰기 (GATE-3 응답 기록)
+**금지 도구:** 그 외 모든 도구 호출 — 특히 GATE-3 대기 중에는 도구 호출 자체가 절대 금지입니다.
 **AI가 스스로 이 게이트를 통과하는 행위는 Critical Violation입니다.**
 
 ### GATE-1. Verify prerequisites
@@ -275,23 +269,22 @@ If either check fails, output the violation block and halt.
 
 ### GATE-2. Display approval block
 
-Output exactly this block (fill in the placeholders):
+Output exactly this block (fill in the placeholders). Use this plain heading + list format, not an ASCII box — box-drawing characters misalign once Korean text/placeholders of varying length are substituted in:
 
 ```
-╔══════════════════════════════════════════════════════════╗
-║         ⏸  EXECUTE SKILL — 인간 승인 게이트             ║
-╠══════════════════════════════════════════════════════════╣
-║  실행 계획: {exec_plan_path}                             ║
-║  위험 수준: {RISK_LEVEL}                                 ║
-║  변경 예정 파일 수: {N}개                                ║
-║                                                          ║
-║  Researcher 위험 요약:                                   ║
-║  {research-brief.md Risk Assessment 요약 (2-3줄 이내)}   ║
-║                                                          ║
-║  ▶ 진행: "approved" 또는 "lgtm" 입력                     ║
-║  ✖ 취소: "abort" 입력                                   ║
-║  ? 그 외 입력: 이 화면을 다시 표시합니다                 ║
-╚══════════════════════════════════════════════════════════╝
+⏸ 검증 확인 필요
+
+- 실행 계획: {exec_plan_path}
+- 위험 수준: {RISK_LEVEL}
+- 변경 예정 파일 수: {N}개
+
+Researcher 위험 요약: {research-brief.md Risk Assessment 요약 (2-3줄 이내)}
+
+| 입력 | 동작 |
+|---|---|
+| `approved` / `lgtm` | 진행 |
+| `abort` | 취소 |
+| 그 외 입력 | 이 화면을 다시 표시 |
 ```
 
 ### GATE-3. Wait for human response
@@ -410,7 +403,7 @@ If the project has a build or lint command detectable from `package.json`, `pypr
 
 ## Phase 4: Reviewer
 
-**허용 도구:** 파일 읽기, run_command (테스트 러너 실행 전용), review-report.md 쓰기
+**허용 도구:** 파일 읽기, run_command (테스트 러너 실행 전용), `review-report.md`/`execute-state.json` 쓰기
 **금지 도구:** 소스 파일 수정, 계획 문서 수정, 테스트 파일 삭제
 
 The Reviewer is a distinct role from the Implementer. Mentally reset: you are now reading the work of someone else.
@@ -534,7 +527,7 @@ Write `docs/exec-plans/active/verification/review-report.md`:
 
 | 시점 | Phase | 이벤트 |
 |------|-------|---------|
-| {started_at} | gate | 인간 승인: "{gate input}" |
+| {started_at} | gate | 검증 확인: "{gate input}" |
 | {finished_at} | walkthrough | Walkthrough 생성 |
 
 ---
@@ -588,20 +581,20 @@ Write `docs/exec-plans/active/verification/review-report.md`:
 **이 구간에서 소스 파일 수정은 절대 금지입니다.**
 
 ```
-╔══════════════════════════════════════════════════════════╗
-║      📋  EXECUTE SKILL — 코드 검토 게이트 (Phase 4.5)   ║
-╠══════════════════════════════════════════════════════════╣
-║  변경된 파일: {N}개                                      ║
-║  Reviewer Verdict: {APPROVED | NEEDS_REVISION}           ║
-║  BLOCKER: {b}건 / WARNING: {w}건                         ║
-║                                                          ║
-║  Walkthrough: docs/.../walkthrough-{slug}.md             ║
-║                                                          ║
-║  위 문서를 확인한 후 아래를 입력하세요:                   ║
-║  ▶ 승인: "lgtm" / "approved" / "signed"                  ║
-║  ✖ 재작업 요청: "revision: {이유}"                       ║
-║  ? 그 외 입력: 이 화면을 다시 표시합니다                 ║
-╚══════════════════════════════════════════════════════════╝
+📋 코드 검토 게이트 (Phase 4.5)
+
+- 변경된 파일: {N}개
+- Reviewer Verdict: {APPROVED | NEEDS_REVISION}
+- BLOCKER: {b}건 / WARNING: {w}건
+- Walkthrough: docs/.../walkthrough-{slug}.md
+
+위 문서를 확인한 후 아래를 입력하세요.
+
+| 입력 | 동작 |
+|---|---|
+| `lgtm` / `approved` / `signed` | 승인 |
+| `revision: {이유}` | 재작업 요청 |
+| 그 외 입력 | 이 화면을 다시 표시 |
 ```
 
 After displaying the gate, **stop calling tools entirely** and wait.
@@ -655,7 +648,8 @@ Process the next user message:
 
 ## Phase 5: Log 출력
 
-**허용 도구:** evals/logs/latest.json 쓰기 전용
+**허용 도구:** `execute-state.json` 읽기, `evals/logs/latest.json` 쓰기
+**금지 도구:** 그 외 모든 쓰기
 
 Write `evals/logs/latest.json` with the following structure.
 This write must happen regardless of whether the session was aborted, completed successfully, or ended with NEEDS_REVISION or REVISION REQUESTED.
@@ -667,6 +661,8 @@ This write must happen regardless of whether the session was aborted, completed 
   "started_at": "{started_at from execute-state.json}",
   "finished_at": "{ISO8601_UTC_now}",
   "input_prompt": "/skill:execute {exec_plan_path}",
+  "model": "{현재 세션에 사용 중인 모델 ID. 확인 불가 시 null}",
+  "token_usage": "{세션이 노출하는 input_tokens/output_tokens/total_tokens. 확인 불가 시 null}",
   "output_result": {
     "exec_plan_path": "{exec_plan_path}",
     "mutation_attempted": "{true if Phase 3 ran, false if aborted before Phase 3}",

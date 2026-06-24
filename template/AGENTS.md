@@ -1,6 +1,6 @@
 # AGENTS.md
 
-
+> 이 파일은 지도(map)입니다 — 각 항목은 실제 내용이 있는 파일로 안내하는 포인터이며, 그 내용을 여기에 복제하지 않습니다. 모든 에이전트 런타임에 자동 주입되어야 하는 강제 규칙(코드 스타일, 금지 패턴 등)은 `.agents/rules/`에 따로 있습니다 — AGENTS.md는 사람·에이전트가 탐색용으로 읽는 문서이고, `.agents/rules/`는 매 세션 자동 적용되는 시스템 레이어입니다.
 
 ## Project Overview
 
@@ -20,15 +20,17 @@
 
 ### Architecture & Design
 - **시스템 상위 구조:** 프로젝트 루트의 [`ARCHITECTURE.md`](./ARCHITECTURE.md)를 참조하세요.
-- **아키텍처 결정 기록 (ADR):** 과거 기술 핵심 설계 사상과 히스토리는 [`./docs/design-docs/adr/`](./docs/design-docs/adr/) 폴더를 확인하세요.
+- **핵심 설계 원칙 (Core Beliefs):** 프로젝트 전체를 관통하는 불변 원칙은 [`docs/design-docs/core-beliefs.md`](./docs/design-docs/core-beliefs.md)에 기록합니다. `deep-interview`가 PRD 확정 시 자동으로 부트스트랩하며, `ralplan`의 Architect 단계가 모든 신규 계획을 이 파일에 비추어 검증합니다.
+- **아키텍처 결정 기록 (ADR):** 개별 기술적 결정의 히스토리는 [`./docs/design-docs/adr/`](./docs/design-docs/adr/) 폴더를 확인하세요. (`core-beliefs.md`는 이 폴더 밖에 있습니다 — ADR은 개별 결정 기록, core-beliefs는 전체를 관통하는 원칙이라 별도 위치입니다.)
 - **ADR 생성 규칙:** `ralplan`을 통해 새로운 기술적 합의를 명문화할 때 에이전트는 반드시 아래 규칙을 따릅니다.
-  1. **파일명:** `docs/design-docs/adr/core-beliefs.md` 및 `NNNN-kebab-case.md` 형식 준수.
+  1. **파일명:** `docs/design-docs/adr/NNNN-kebab-case.md` 형식 준수.
   2. **포맷:** 반드시 폴더 내의 템플릿 구조를 복사하여 아키텍처 결정 배경과 제약 조건을 누락 없이 채우세요.
 
 ### Guardrails & Quality
 - **전역 에이전트 행동 규칙:** 코드 스타일, 언어 규칙, 금지 패턴은 [`.agents/rules/global.md`](./.agents/rules/global.md)에 정의합니다.
   - 이 파일은 에이전트 런타임에 자동 주입되는 시스템 레이어입니다. 프로젝트별 규칙을 이곳에 채워 넣으세요.
 - **QA 페르소나 규칙:** QA 역할 전용 행동 지침은 [`.agents/rules/persona-qa.md`](./.agents/rules/persona-qa.md)를 참조하세요.
+- **Execute 페르소나 규칙:** Researcher/Planner/Implementer/Reviewer 역할 경계와 승인 게이트는 [`.agents/rules/persona-execute.md`](./.agents/rules/persona-execute.md)를 참조하세요.
 
 ### LLM-friendly References
 
@@ -120,6 +122,9 @@ python evals/run-evals.py promote execute "설명"
 ```
 
 ## Code style
+- 전역 강제 규칙 (모든 에이전트 런타임에 자동 주입): [`.agents/rules/global.md`](./.agents/rules/global.md)
+- 이번 프로젝트에서 확정된 스택별 스타일 가이드/린터/포맷터: `docs/product-specs/PRD.md`의 `## Code Style & Tooling` 표 참고 (`deep-interview`가 합의 즉시 위 `global.md`에도 반영합니다)
 
-
-## Testing instructions
+## Testing instructions
+- 테스트 실행 명령: 위 [Development Commands](#development-commands) 참고
+- QA 역할 규칙: [`.agents/rules/persona-qa.md`](./.agents/rules/persona-qa.md), [`.agents/skills/qa/SKILL.md`](./.agents/skills/qa/SKILL.md)

@@ -21,7 +21,7 @@ WEIGHTS: dict[str, float] = {
 }
 
 # PRD에 반드시 존재해야 할 기본 섹션 헤더
-DEFAULT_REQUIRED_SECTIONS: list[str] = ["scope topology", "constraints", "acceptance criteria"]
+DEFAULT_REQUIRED_SECTIONS: list[str] = ["scope topology", "constraints", "acceptance criteria", "tech stack", "code style"]
 
 
 def score(case: dict[str, Any], log: dict[str, Any], project_root: str) -> dict[str, Any]:

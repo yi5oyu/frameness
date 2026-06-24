@@ -1,3 +1,8 @@
+---
+trigger: always_on
+description: 모든 스킬·모든 세션에 적용되는 전역 규칙 (언어, 금지 패턴, 에러 처리)
+---
+
 # Global Agent Rules
 
 <!-- 

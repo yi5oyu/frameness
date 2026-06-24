@@ -9,7 +9,8 @@ run-evals.py — 에이전트 하네스 평가 실행기
 사용 흐름 (반자동):
   1. 에이전트로 스킬을 수동 실행한다.
   2. 에이전트가 evals/logs/latest.json에 실행 결과를 기록한다.
-  3. `run` 명령으로 채점한다 → logs/history/에 누적된다.
+  3. `run` 명령으로 채점한다 → logs/history/*.json(원본)에 누적되고,
+     logs/history.md(사람이 읽는 표: 시각/스킬/모델/토큰/소요시간/프롬프트/점수)가 자동 재생성된다.
   4. 결과가 마음에 들면 `promote`로 골든 케이스로 승격한다.
 """
 
@@ -33,6 +34,7 @@ SCORERS_DIR  = os.path.join(SCRIPT_DIR, "scorers")
 LOGS_DIR     = os.path.join(SCRIPT_DIR, "logs")
 HISTORY_DIR  = os.path.join(LOGS_DIR, "history")
 LATEST_LOG   = os.path.join(LOGS_DIR, "latest.json")
+HISTORY_MD   = os.path.join(LOGS_DIR, "history.md")
 
 SKILL_SCORER_MAP: dict[str, str] = {
     "deep-interview": "deep_interview_scorer",
@@ -83,6 +85,29 @@ def _load_scorer(skill: str):
     return module
 
 
+def _parse_iso(ts: str) -> datetime | None:
+    """ISO8601 문자열을 datetime으로 변환한다. 파싱 실패 시 None."""
+    if not ts:
+        return None
+    try:
+        return datetime.fromisoformat(ts.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def _format_duration(started_at: str, finished_at: str) -> str:
+    """started_at/finished_at 두 타임스탬프로부터 실행 기간(초)을 계산한다."""
+    start, end = _parse_iso(started_at), _parse_iso(finished_at)
+    if start is None or end is None:
+        return "N/A"
+    return f"{(end - start).total_seconds():.1f}s"
+
+
+def _truncate(text: str, length: int = 40) -> str:
+    text = (text or "").replace("\n", " ").strip()
+    return text if len(text) <= length else text[: length - 1] + "…"
+
+
 def _archive_log(result: dict[str, Any]) -> str:
     """채점 완료된 로그를 history/ 폴더에 타임스탬프 파일명으로 복사한다."""
     os.makedirs(HISTORY_DIR, exist_ok=True)
@@ -94,6 +119,35 @@ def _archive_log(result: dict[str, Any]) -> str:
     return dest
 
 
+def _build_md_rows(files: list[str]) -> list[dict[str, str]]:
+    """history/ 내 원본 JSON 로그들을 사람이 읽는 표용 행(row) 목록으로 변환한다."""
+    md_rows: list[dict[str, str]] = []
+    for fpath in files:
+        data        = _load_json(fpath)
+        skill       = data.get("skill", "unknown")
+        score       = data.get("eval_score")
+        ts          = os.path.basename(fpath).replace(f"_{skill}.json", "")
+        token_usage = data.get("token_usage") or {}
+        md_rows.append({
+            "ts":       ts,
+            "skill":    skill,
+            "model":    data.get("model") or "N/A",
+            "tokens":   str(token_usage.get("total_tokens", "N/A")),
+            "duration": _format_duration(data.get("started_at", ""), data.get("finished_at", "")),
+            "prompt":   _truncate(data.get("input_prompt", "")),
+            "score":    f"{score:.2f}" if score is not None else "N/A",
+        })
+    return md_rows
+
+
+def _regenerate_history_md(target_path: str = HISTORY_MD) -> None:
+    """logs/history/ 전체를 모아 target_path의 마크다운 표 구간을 재생성한다."""
+    files    = sorted(glob.glob(os.path.join(HISTORY_DIR, "*.json")), reverse=True)
+    md_rows  = _build_md_rows(files)
+    table_md = _build_history_markdown(md_rows)
+    _write_md_section(target_path, table_md)
+
+
 # ---------------------------------------------------------------------------
 # 진입점 1: run — 평가 실행 및 채점
 # ---------------------------------------------------------------------------
@@ -101,7 +155,8 @@ def _archive_log(result: dict[str, Any]) -> str:
 def cmd_run(args: argparse.Namespace) -> None:
     """
     latest.json을 읽어 해당 스킬의 채점기를 실행한다.
-    채점 결과를 latest.json에 기록하고 history/에 누적한다.
+    채점 결과를 latest.json에 기록하고 history/에 누적한 뒤,
+    사람이 읽는 logs/history.md 표를 자동으로 재생성한다.
     """
     log = _load_json(LATEST_LOG)
     skill = args.skill or log.get("skill")
@@ -156,6 +211,10 @@ def cmd_run(args: argparse.Namespace) -> None:
         archive_path = _archive_log({**log, "eval_results": results})
         print(f"📁 결과 아카이브: {archive_path}")
 
+        # 사람이 읽는 실행 기록 표 자동 갱신 (logs/history.md)
+        _regenerate_history_md()
+        print(f"📝 실행 기록 표 갱신: {HISTORY_MD}")
+
 
 # ---------------------------------------------------------------------------
 # 진입점 2: report — 히스토리 요약
@@ -173,7 +232,7 @@ def cmd_report(args: argparse.Namespace) -> None:
     limit = args.last or len(history_files)
     target_files = history_files[:limit]
 
-    # 스킬별 점수 집계
+    # 스킬별 점수 집계 (콘솔 표용)
     skill_scores: dict[str, list[float]] = {}
     rows: list[tuple[str, str, str, str]] = []
 
@@ -199,6 +258,60 @@ def cmd_report(args: argparse.Namespace) -> None:
     for skill, scores in skill_scores.items():
         avg = sum(scores) / len(scores)
         print(f"  {skill:<18}: {avg:.2f}  (n={len(scores)})")
+
+    if args.write_md:
+        table_md = _build_history_markdown(_build_md_rows(target_files))
+        _write_md_section(args.write_md, table_md)
+        print(f"\n📝 실행 기록 표 갱신: {args.write_md}")
+
+
+# ---------------------------------------------------------------------------
+# 사람이 읽는 실행 기록 마크다운 표 생성/주입
+# ---------------------------------------------------------------------------
+
+HISTORY_TABLE_START = "<!-- EVALS_HISTORY_TABLE:START (run-evals.py report --write-md 가 자동 생성/갱신함. 직접 수정하지 마세요) -->"
+HISTORY_TABLE_END   = "<!-- EVALS_HISTORY_TABLE:END -->"
+
+
+def _build_history_markdown(md_rows: list[dict[str, str]]) -> str:
+    """logs/history/ 전체를 모아 사람이 읽는 실행 기록 표를 생성한다."""
+    lines = [
+        "| 시각 | 스킬 | 모델 | 토큰(총합) | 소요 시간 | 프롬프트 | 점수 |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for r in md_rows:
+        lines.append(
+            f"| {r['ts']} | {r['skill']} | {r['model']} | {r['tokens']} | "
+            f"{r['duration']} | {r['prompt']} | {r['score']} |"
+        )
+    return "\n".join(lines)
+
+
+def _write_md_section(path: str, table_md: str) -> None:
+    """
+    path의 마크다운 파일 안에서 HISTORY_TABLE_START~END 사이만 교체한다.
+    마커가 없으면 파일 끝에 새 섹션으로 추가한다. 그 외 기존 내용은 보존한다.
+    """
+    section = f"{HISTORY_TABLE_START}\n{table_md}\n{HISTORY_TABLE_END}"
+
+    existing = ""
+    if os.path.isfile(path):
+        with open(path, encoding="utf-8") as f:
+            existing = f.read()
+
+    if HISTORY_TABLE_START in existing and HISTORY_TABLE_END in existing:
+        pre  = existing.split(HISTORY_TABLE_START)[0]
+        post = existing.split(HISTORY_TABLE_END)[1]
+        new_content = pre + section + post
+    elif existing:
+        separator = "" if existing.endswith("\n\n") else ("\n" if existing.endswith("\n") else "\n\n")
+        new_content = f"{existing}{separator}## 실행 기록 (자동 생성)\n\n{section}\n"
+    else:
+        new_content = f"## 실행 기록 (자동 생성)\n\n{section}\n"
+
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(new_content)
 
 
 # ---------------------------------------------------------------------------
@@ -259,6 +372,7 @@ def build_parser() -> argparse.ArgumentParser:
     # report
     p_report = sub.add_parser("report", help="히스토리 점수 추이를 출력한다")
     p_report.add_argument("--last", type=int, metavar="N", help="최근 N개 로그만 표시 (기본: 전체)")
+    p_report.add_argument("--write-md", metavar="PATH", help="logs/history.md 외에 추가로 지정 경로의 마크다운 파일에도 실행 기록 표를 갱신한다 (기존 내용은 보존, 마커 구간만 재생성)")
 
     # promote
     p_promote = sub.add_parser("promote", help="latest.json을 골든 케이스로 승격한다")

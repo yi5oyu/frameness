@@ -1,5 +1,6 @@
 ---
-trigger: always_on
+trigger: model_decision
+description: "/skill:qa 실행 중에만 적용 — QA 에이전트의 행동을 제어한다. execute의 Implementer 단계처럼 소스 수정이 허용된 다른 스킬에는 적용되지 않는다."
 ---
 
 # QA Agent Persona

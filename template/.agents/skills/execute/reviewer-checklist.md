@@ -29,7 +29,7 @@
 ### 2-3. 아키텍처 준수
 - [ ] `ARCHITECTURE.md`의 레이어 경계를 위반하지 않는가?
 - [ ] 순환 참조가 발생하지 않는가?
-- [ ] `docs/design-docs/adr/core-beliefs.md`의 핵심 설계 원칙에 반하지 않는가?
+- [ ] `docs/design-docs/core-beliefs.md`의 핵심 설계 원칙에 반하지 않는가?
 
 ## 3. 테스트 체크 (BLOCKER 또는 WARNING 또는 NOTE)
 

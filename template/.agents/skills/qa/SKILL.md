@@ -45,6 +45,8 @@ Before Step 1, read `.agents/settings.json` and extract:
 
 If `.agents/settings.json` is unreadable, proceed with default language `ko` and log the limitation.
 
+Also read `.agents/rules/global.md` (global anti-patterns/error-handling, applies to any test code written) and `.agents/rules/persona-qa.md` (this skill's own boundary: never modify production source) — read both explicitly here rather than relying solely on host auto-injection from their frontmatter `trigger`.
+
 Record the session start timestamp as `qa_started_at` for the final eval log.
 
 ---
@@ -79,6 +81,8 @@ After writing the QA report, write `evals/logs/latest.json`. This write is uncon
   "started_at": "{qa_started_at}",
   "finished_at": "{ISO8601_UTC_now}",
   "input_prompt": "/skill:qa {flags} {exec_plan_path}",
+  "model": "{현재 세션에 사용 중인 모델 ID. 확인 불가 시 null}",
+  "token_usage": "{세션이 노출하는 input_tokens/output_tokens/total_tokens. 확인 불가 시 null}",
   "output_result": {
     "test_files_written": ["{paths of test files written}"],
     "report_path": "docs/exec-plans/active/verification/qa-report-{slug}.md",
