@@ -1,6 +1,6 @@
 {
   "name": "frameness",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "bin": {
     "frameness": "bin/index.js"
