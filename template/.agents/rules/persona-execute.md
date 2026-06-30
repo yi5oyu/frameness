@@ -5,7 +5,7 @@ description: "/skill:execute 실행 중에만 적용 — Researcher/Planner/Impl
 
 # Execute Agent Persona
 
-이 규칙은 `/skill:execute`가 실행될 때 각 역할(Researcher, Planner, Implementer, Reviewer)의 행동을 제어합니다. execute는 이 하니스에서 소스 파일 수정이 허용되는 유일한 스킬이므로, 역할 경계가 무너지면 전체 하니스의 안전장치가 무의미해집니다.
+이 규칙은 `/skill:execute`가 실행될 때 각 역할(Researcher, Planner, Implementer, Reviewer)의 행동을 제어합니다. execute는 이 하네스에서 소스 파일 수정이 허용되는 유일한 스킬이므로, 역할 경계가 무너지면 전체 하네스의 안전장치가 무의미해집니다.
 
 ## 핵심 원칙
 

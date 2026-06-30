@@ -45,17 +45,27 @@ async function startCli() {
                 rl.close();
                 return;
             }
-            case '3':
+            case '3': {
+                const skillsDir = path.join(targetDir, '.agents/skills');
+                if (fs.existsSync(skillsDir)) {
+                    const answer = await rl.question('\n⚠️  .agents/skills/ 디렉터리가 이미 존재합니다. 덮어쓰기 하시겠습니까? (y/N): ');
+                    if (answer.trim().toLowerCase() !== 'y') {
+                        console.log("\n⏭️  설치를 건너뜁니다.");
+                        rl.close();
+                        return;
+                    }
+                }
                 handleInit('skills');
                 rl.close();
                 return;
+            }
             case '4':
                 console.log("\n👋 frameness를 종료합니다.");
                 rl.close();
                 return;
             default:
                 console.log("\n❌ 잘못된 번호입니다. 1번부터 4번 사이의 숫자를 입력해 주세요.");
-            // 루프 継続 — rl.close() 호출하지 않음
+            // 루프 — rl.close() 호출하지 않음
         }
     }
 }

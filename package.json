@@ -5,5 +5,8 @@
   "bin": {
     "frameness": "bin/index.js"
   },
-  "description": "AI 에이전트 하네스 구조 초기화 도구"
+  "description": "AI 에이전트 하네스 구조 초기화 도구",
+  "engines": {
+    "node": ">=18"
+  }
 }

@@ -14,12 +14,20 @@ export function handleSkillsMode() {
         const sourceSkills = path.join(baseTemplateDir, '.agents/skills');
         const targetSkills = path.join(targetDir, '.agents/skills');
 
-        // 목적지에 .agents/skills 폴더가 없다면 안전하게 자동 생성
         fs.mkdirSync(targetSkills, { recursive: true });
+        fs.cpSync(sourceSkills, targetSkills, { recursive: true, force: true });
 
-        fs.cpSync(sourceSkills, targetSkills, { recursive: true });
+        // rules/ 파일: execute·qa·deep-interview·ralplan이 Phase 0에서 명시적으로 읽음
+        // 기존 rules/가 없을 때만 설치 (커스텀 규칙 보호)
+        const sourceRules = path.join(baseTemplateDir, '.agents/rules');
+        const targetRules = path.join(targetDir, '.agents/rules');
+        if (fs.existsSync(sourceRules) && !fs.existsSync(targetRules)) {
+            fs.mkdirSync(targetRules, { recursive: true });
+            fs.cpSync(sourceRules, targetRules, { recursive: true });
+            console.log("  ↳ rules/ 동반 설치 (스킬들의 Phase 0 필수 의존성)");
+        }
 
-        // deep-interview가 settings.json을 blocking prerequisite으로 요구하므로 함께 복사
+        // settings.json: deep-interview blocking prerequisite
         const srcSettings = path.join(baseTemplateDir, '.agents/settings.json');
         const destSettings = path.join(targetDir, '.agents/settings.json');
         if (fs.existsSync(srcSettings) && !fs.existsSync(destSettings)) {
