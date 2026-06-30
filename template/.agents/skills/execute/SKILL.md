@@ -111,7 +111,43 @@ Extract from the ep-*.md:
 - Affected file list (look for a section named `Affected Files`, `변경 파일`, or equivalent)
 - Estimated change count
 
-### 0-3. Create execute-state.json
+### 0-3. Workspace Selection Gate
+
+Display this block and wait for human input before proceeding:
+
+```
+┌─────────────────────────────────────────────────┐
+│  🔀 작업 공간 선택                               │
+├─────────────────────────────────────────────────┤
+│                                                 │
+│  A  worktree   새 브랜치 + 격리 폴더에서 작업   │
+│               (메인 브랜치 보호, 병렬 작업 가능) │
+│                                                 │
+│  B  direct     현재 브랜치에서 바로 시작         │
+│                                                 │
+├─────────────────────────────────────────────────┤
+│  입력: worktree  또는  direct                   │
+└─────────────────────────────────────────────────┘
+```
+
+Process the next user message:
+- `worktree` (stripped, case-insensitive):
+  - Record to `human_inputs` (phase: "workspace-gate")
+  - Output:
+    ```
+    ⏸ [execute] 워크트리 설정 후 돌아오세요.
+       /skill:using-git-worktrees 를 먼저 실행하고 다시 /skill:execute 를 호출하세요.
+    ```
+  - Halt session (do not proceed to 0-4)
+- `direct` (stripped, case-insensitive):
+  - Record to `human_inputs` (phase: "workspace-gate")
+  - Output: `✅ 현재 브랜치에서 직접 진행합니다.`
+  - Continue to 0-4
+- Any other input:
+  - Output: `⚠️ "worktree" 또는 "direct" 를 입력하세요.`
+  - Re-display the block and wait again
+
+### 0-4. Create execute-state.json
 
 Write `docs/exec-plans/active/verification/execute-state.json`:
 
@@ -119,22 +155,25 @@ Write `docs/exec-plans/active/verification/execute-state.json`:
 {
   "run_id": "run-{unix_timestamp}",
   "started_at": "{ISO8601_UTC}",
+  "workspace": "{worktree | direct}",
   "files_mutated": [],
   "human_inputs": [],
   "files_read": []
 }
 ```
 
+- `workspace`: 0-3에서 선택한 작업 공간 유형
 - `files_mutated`: Phase 3에서 실제로 변경된 파일 경로 배열
 - `human_inputs`: 각 게이트에서 인간이 입력한 내용 (타임스탬프 포함)
 - `files_read`: 각 Phase에서 에이전트가 읽은 파일 로그 (phase·path·reason 포함)
 
-### 0-4. Announce start
+### 0-5. Announce start
 
 Output to user:
 ```
 🚀 [execute] 시작
    플랜: {exec_plan_path}
+   작업 공간: {worktree 격리 | 현재 브랜치 직접}
    Phase 0: 초기화 완료 → Phase 1: Researcher 진입
 ```
 

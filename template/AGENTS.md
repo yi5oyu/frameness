@@ -51,13 +51,13 @@
    → 산출물: docs/exec-plans/active/verification/stage-*-*.md
              docs/exec-plans/active/ep-{slug}.md  [Pending Approval] (검증 완료)
 
-2.5단계: 격리 워크스페이스 생성  ← 소스 수정 발생 전 최후 시점
+2.5단계: 격리 워크스페이스 생성  [선택]
    /skill:using-git-worktrees
-   → 새 브랜치 + 워크트리 폴더 생성, 베이스라인 테스트 통과 확인
-   ※ deep-interview·ralplan은 소스를 수정하지 않으므로 메인에서 진행 가능
-   ※ execute가 첫 번째 소스 수정 → 그 직전에 격리 필요
+   스킬 실행 시 워크트리 생성 여부를 직접 선택합니다.
+   A. 워크트리 격리 (권장): 새 브랜치 + 워크트리 폴더 생성, 베이스라인 테스트 확인
+   B. 현재 브랜치 직접 작업: 스킬이 동의 없으면 워크트리 없이 진행
 
-3단계: 구현 실행  (격리된 워크트리 안에서)
+3단계: 구현 실행
    /skill:execute docs/exec-plans/active/ep-{slug}.md
    → 산출물: docs/exec-plans/active/verification/research-brief.md
              docs/exec-plans/active/verification/implementation-log.md
