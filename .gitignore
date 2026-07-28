@@ -1,0 +1,10 @@
+node_modules/
+
+# 로컬 전용 설정 (공유 설정은 .claude/settings.json)
+.claude/settings.local.json
+
+# 설치 테스트 산출물
+test-feat/
+
+# npm pack 결과물
+*.tgz

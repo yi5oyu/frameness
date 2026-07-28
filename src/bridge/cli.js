@@ -1,73 +1,52 @@
-import readline from 'readline/promises';
-import { stdin as input, stdout as output } from 'process';
 import fs from 'fs';
 import path from 'path';
-import { handleInit } from '../commands/init.js';
-
-// Full/Main 모드 실행 전 기존 가드레일 파일이 존재하면 덮어쓰기 여부 확인
-async function confirmOverwrite(rl, targetDir, checkFiles) {
-    const existing = checkFiles.filter(f => fs.existsSync(path.join(targetDir, f)));
-    if (existing.length === 0) return true;
-
-    console.log(`\n⚠️  이미 존재하는 파일이 감지되었습니다: ${existing.join(', ')}`);
-    const answer = await rl.question("   덮어쓰기 하시겠습니까? (y/N): ");
-    return answer.trim().toLowerCase() === 'y';
-}
+import { installTemplate } from '../commands/install.js';
+import { banner, select, confirm, closeUi, dim, bold } from './ui.js';
 
 async function startCli() {
-    const rl = readline.createInterface({ input, output });
+    const pkg = JSON.parse(
+        fs.readFileSync(new URL('../../package.json', import.meta.url), 'utf8')
+    );
 
-    console.log("\n=================================");
-    console.log("   🪄 Welcome to frameness CLI   ");
-    console.log("=================================");
-    console.log("1. 🚀 전체 하네스 구성 불러오기 (Full)");
-    console.log("2. 📄 주요 가드레일 파일만 불러오기 (Main Files Only)");
-    console.log("3. 🧠 에이전트 스킬 세트만 불러오기 (Skills Only)");
-    console.log("4. ❌ 종료하기");
-    console.log("=================================");
+    banner([
+        { text: 'frameness', style: bold },
+        { text: `AI agent harness installer · v${pkg.version}`, style: dim },
+    ]);
+    console.log(` ${dim('cwd')} ${process.cwd()}\n`);
 
-    // 유효한 입력이 들어올 때까지 재시도
-    while (true) {
-        const choice = await rl.question("\n원하는 작업의 번호를 입력하세요 (1~4): ");
-        const targetDir = process.cwd();
-        const guardRailFiles = ['AGENTS.md', 'ARCHITECTURE.md', 'PLANS.md'];
+    // 두 판은 1:1 대응. ep 섹션명·상태 레이블 등 기계 표면은 양쪽 공통 영어다.
+    const lang = await select('템플릿 언어 (template language)', [
+        { label: 'English', value: 'en' },
+        { label: '한국어', value: 'ko' },
+        { label: 'Exit', hint: '종료', value: 'exit' },
+    ]);
 
-        switch (choice.trim()) {
-            case '1': {
-                const ok = await confirmOverwrite(rl, targetDir, guardRailFiles);
-                if (ok) handleInit('full');
-                rl.close();
-                return;
-            }
-            case '2': {
-                const ok = await confirmOverwrite(rl, targetDir, guardRailFiles);
-                if (ok) handleInit('main');
-                rl.close();
-                return;
-            }
-            case '3': {
-                const skillsDir = path.join(targetDir, '.agents/skills');
-                if (fs.existsSync(skillsDir)) {
-                    const answer = await rl.question('\n⚠️  .agents/skills/ 디렉터리가 이미 존재합니다. 덮어쓰기 하시겠습니까? (y/N): ');
-                    if (answer.trim().toLowerCase() !== 'y') {
-                        console.log("\n⏭️  설치를 건너뜁니다.");
-                        rl.close();
-                        return;
-                    }
-                }
-                handleInit('skills');
-                rl.close();
-                return;
-            }
-            case '4':
-                console.log("\n👋 frameness를 종료합니다.");
-                rl.close();
-                return;
-            default:
-                console.log("\n❌ 잘못된 번호입니다. 1번부터 4번 사이의 숫자를 입력해 주세요.");
-            // 루프 — rl.close() 호출하지 않음
+    if (lang === 'exit') {
+        console.log(`\n ${dim('frameness를 종료합니다.')}\n`);
+        return;
+    }
+
+    // 기존 계약 보호 — 덮어쓰기 전 확인
+    const targetDir = process.cwd();
+    const existing = ['AGENTS.md', 'CLAUDE.md'].filter((f) =>
+        fs.existsSync(path.join(targetDir, f))
+    );
+    if (existing.length > 0) {
+        const ok = await confirm(`이미 존재: ${existing.join(', ')} — 덮어쓸까요?`, false);
+        if (!ok) {
+            console.log(`\n ${dim('설치를 건너뜁니다.')}\n`);
+            return;
         }
     }
+
+    console.log('');
+    if (!installTemplate(lang)) return;
+
+    console.log('');
+    console.log(` ${dim('다음 단계:')}`);
+    console.log(`   ${dim('1. setup — 스택·폴더 구조를 정하고 폴더별 AGENTS.md 생성')}`);
+    console.log(`   ${dim('2. plan 또는 execute — 첫 작업 시작')}`);
+    console.log('');
 }
 
-startCli();
+startCli().finally(closeUi);
