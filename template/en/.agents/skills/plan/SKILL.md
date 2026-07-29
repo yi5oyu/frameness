@@ -19,8 +19,11 @@ If the target folder has no AGENTS.md, or its `## Commands` is empty, point to
    and get it confirmed.
 4. When no decisions remain, fill a copy of `ep-0000-template.md` with the
    agreement and save it as `[Draft]`. Every acceptance criterion must be a
-   decidable sentence. Decisions that persist project-wide (stack, conventions,
-   commands) go to that folder's AGENTS.md, not into the ep.
+   decidable sentence. When a question offered a trade-off, record the choice
+   **and the rejected option with its reason** in `## Decisions` — the rejected
+   option is what a later reader cannot recover. Decisions that persist
+   project-wide (stack, conventions, commands) go to that folder's AGENTS.md,
+   not into the ep.
 5. Report the ep path and **point to `execute`, then stop.**
    Do not request approval here — execute collects it and records `## Approval`.
    The point is to keep approval in one place.

@@ -29,7 +29,7 @@ Change Log의 사유 메모나 구현 세션의 자기 평가는 읽지 **않는
 3. 규칙 위반과 명백한 결함을 확인한다.
 4. 지적을 분류한다: **BLOCKER**(머지 불가 결함) / **WARNING**(위험) /
    **NOTE**(참고). 모든 지적에 `파일:줄` 근거를 단다.
-5. ep에 `## Review`를 덧붙인다:
+5. ep의 `## Review`를 채운다:
    `verdict: APPROVED | NEEDS_REVISION` (BLOCKER 0개면 APPROVED) + 지적들.
 6. ep `## Run History` 1줄.
 

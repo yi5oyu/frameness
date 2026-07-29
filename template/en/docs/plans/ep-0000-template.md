@@ -1,6 +1,8 @@
 # ep-{YYYYMMDD}-{slug}: {task name}
 
 **Status:** [Draft]
+<!-- Draft → Approved → In Progress → Done.
+     Always record the status before the change that produced it. -->
 
 > You may be a stateless agent — do not rely on past conversation; write so
 > the work can be completed from this file and the codebase alone.
@@ -8,6 +10,15 @@
 ## Purpose
 
 <!-- Why this change is needed. What to look at afterwards to confirm it works. 1-3 lines. -->
+
+## Decisions
+
+<!-- At each fork: what was chosen, and what was rejected. The reason for
+     rejecting is the point. Leave empty if none. Filled by plan during the
+     interview, and by debug once the root cause is confirmed.
+
+     - Sessions in Redis — stateless JWT cannot be revoked immediately
+-->
 
 ## Affected Files
 
@@ -28,6 +39,18 @@
 -->
 - [ ] {decidable criterion 1}
 
+## Risk
+
+<!-- Filled by execute step 1, only when it meets a risk signal:
+     global state · public API change · migration · auth/security -->
+
+(none)
+
+## Implementation Order
+
+<!-- Filled by execute step 2.
+     {n}. {path} {CREATE|MODIFY|DELETE} — {why, one line} -->
+
 ## Approval
 
 <!-- Re-approval is a new entry; the last entry is the one in force.
@@ -44,6 +67,14 @@
 ## Change Log
 
 <!-- {ISO8601} {CREATE|MODIFY|DELETE} {path} — {why, one line} -->
+
+## Review
+
+<!-- Filled by the review skill. Optional.
+     verdict: APPROVED | NEEDS_REVISION
+     - BLOCKER|WARNING|NOTE {file:line} — {what} -->
+
+(not run)
 
 ## Run History
 

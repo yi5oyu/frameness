@@ -23,10 +23,11 @@ When you meet a symptom, stop the fixing hand and enter this loop.
 5. **Fix — this splits on where it was found.**
    - **During implementation** (a failure inside execute steps 4-5) → use this
      loop for root-cause tracing only; fix within the ep already in progress.
-     No new ep.
+     Write the confirmed root-cause paragraph to that ep's `## Decisions` —
+     a Change Log line is too small to hold it. No new ep.
    - **After close** (a bug found after `[Done]`) → create a new ep holding the
-     root-cause paragraph and the fix approach, and go to AGENTS.md `Procedure`
-     step 2.
+     root-cause paragraph in `## Decisions` and the fix approach, and go to
+     AGENTS.md `Procedure` step 2.
 
    Investigation itself needs no ep — only the fix does.
 6. **Lock:** turn the reproduction command from step 1 into a regression test and

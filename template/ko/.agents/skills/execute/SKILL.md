@@ -23,12 +23,12 @@ disable-model-invocation: true
 
 Affected File마다: 파일을 읽고 → 1홉 import 의존을 확인하고 → 그 테스트를 찾는다.
 위험 신호(전역 상태 · 공개 API 변경 · 마이그레이션 · 인증/보안)가 있으면 ep에
-`## Risk`를 덧붙이고 이유를 적는다. 계획에 없던 파일이 필요해지면 이유와 함께
+`## Risk`를 채우고 이유를 적는다. 계획에 없던 파일이 필요해지면 이유와 함께
 Affected Files에 추가한다 — 승인은 다음 단계에서 한 번에 받는다.
 
 ## 2. 순서
 
-ep에 `## Implementation Order`를 덧붙인다 — 항목마다
+ep의 `## Implementation Order`를 채운다 — 항목마다
 `{n}. {경로} {CREATE|MODIFY|DELETE} — {왜, 한 줄}`.
 빠진 파일이 없는지 기준과 교차 확인한다.
 

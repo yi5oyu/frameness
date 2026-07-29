@@ -31,7 +31,7 @@ self-assessment — judge from the claims (plan) and the raw material (diff) alo
 3. Check for rule violations and obvious defects.
 4. Classify findings: **BLOCKER** (unmergeable defect) / **WARNING** (risk) /
    **NOTE** (fyi). Every finding carries `file:line` grounds.
-5. Append `## Review` to the ep:
+5. Fill in the ep's `## Review`:
    `verdict: APPROVED | NEEDS_REVISION` (0 BLOCKERs = APPROVED) + findings.
 6. One ep `## Run History` line.
 

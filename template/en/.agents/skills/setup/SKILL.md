@@ -36,8 +36,8 @@ Open with one comment line: `Procedure lives in the root AGENTS.md. This file
 holds only this folder's facts.`
 The first line of `## Structure` is what this folder is responsible for — the
 domain is split up and recorded there.
-Do not create `## Forbidden` or `## Style` yet — rules written before any code
-exists are hollow.
+Do not create `## Forbidden` yet — rules written before any code exists are
+hollow.
 
 ## 5. Verify
 

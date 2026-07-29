@@ -23,13 +23,13 @@ Input: one `docs/plans/active/ep-*.md`.
 
 For each Affected File: read it → check 1-hop import dependencies → find its
 tests. On risk signals (global state · public API change · migration ·
-auth/security), append `## Risk` to the ep with reasons. If a file missing from
+auth/security), fill in the ep's `## Risk` with reasons. If a file missing from
 the plan turns out to be needed, add it to Affected Files with the reason —
 approval is collected once at the next step.
 
 ## 2. Order
 
-Append `## Implementation Order` to the ep — per item:
+Fill in the ep's `## Implementation Order` — per item:
 `{n}. {path} {CREATE|MODIFY|DELETE} — {why, one line}`.
 Cross-check against the acceptance criteria for missing files.
 

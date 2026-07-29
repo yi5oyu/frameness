@@ -20,10 +20,13 @@ A plan (ep) = `docs/plans/active/ep-{YYYYMMDD}-{slug}.md` — created by copying
 5. **Close** — set Status to `[Done]`, move the file to `done/`, then commit
    (one-line subject + footer `ep: {slug}`).
 
-- In a plan, `## Approval`·`## Change Log`·`## Run History`·`## Review` are
-  append-only — never edit past lines to match reality. Status and the criteria
-  checkboxes are updated. Adding a file to `## Affected Files` requires
+- In a plan, `## Approval`·`## Change Log`·`## Run History` are append-only —
+  never edit past lines to match reality. Every other section is filled in
+  place. Status and the criteria checkboxes are updated; record Status before
+  the change that produced it. Adding a file to `## Affected Files` requires
   re-approval.
+- At a fork, record the choice and the rejected option with its reason in
+  `## Decisions` — the rejected option is what the code cannot recover.
 - Ambiguous is not approved — re-present. If it reads as a stop, stop.
 - One `## Run History` line at every run end — done, aborted, or failed.
 - A subfolder's AGENTS.md holds that folder's facts (`## Commands` ·
