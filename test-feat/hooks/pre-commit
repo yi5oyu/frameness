@@ -1,0 +1,3 @@
+#!/bin/sh
+# harness pre-commit gate — enable: git config core.hooksPath .agents/hooks
+exec node "$(git rev-parse --show-toplevel)/.agents/hooks/pre-commit.js"
