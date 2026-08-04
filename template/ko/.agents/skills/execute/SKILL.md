@@ -1,6 +1,6 @@
 ---
 name: execute
-description: ep 하나를 조사·순서·승인·구현·마감까지 한 세션에서 끌고 간다. 모든 산출물은 ep에 남는다.
+description: ep 하나를 조사·순서·승인·구현·완료까지 한 세션에서 끌고 간다. 모든 산출물은 ep에 남는다.
 disable-model-invocation: true
 ---
 
@@ -71,7 +71,7 @@ green이면 기준마다 확인 근거를 `## Acceptance Criteria` 같은 줄에
 Risk가 있거나 파일을 4개 이상 고쳤으면 독립 리뷰를 권한다 — **새 세션에서,
 되도록 구현자와 다른 모델로** `review ep-{slug}`.
 
-## 6. 마감
+## 6. 완료
 
 사람 `lgtm` → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/`으로 이동
 → 커밋). Run History 줄에 검증 결과를 함께 적는다.

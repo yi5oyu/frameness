@@ -13,7 +13,7 @@
    Status를 `[In Progress]`로 바꾸고, 변경 즉시 `## Change Log` 1줄.
 4. **검증** — `## Approval`의 기준을 하나씩 확인해 `## Acceptance Criteria`에
    체크하고, 통과·실패와 커밋 메시지 안을 함께 제시한다. 인간 승인.
-5. **마감** — Status를 `[Done]`으로 바꾸고 `done/`으로 옮긴 뒤 커밋
+5. **완료** — Status를 `[Done]`으로 바꾸고 `done/`으로 옮긴 뒤 커밋
    (제목 한 줄 + 푸터 `ep: {slug}`).
 
 - 계획(ep)에서 `## Approval`·`## Change Log`·`## Run History`는 append 전용이다
