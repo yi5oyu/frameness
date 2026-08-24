@@ -2,6 +2,26 @@
   "name": "frameness",
   "version": "2.0.0",
   "type": "module",
+  "description": "AI 에이전트 하네스 구조 초기화 도구",
+  "license": "MIT",
+  "author": "Young <yi5oyu@gmail.com>",
+  "homepage": "https://github.com/yi5oyu/frameness#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yi5oyu/frameness.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yi5oyu/frameness/issues"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "harness",
+    "agents-md",
+    "claude-code",
+    "scaffold",
+    "cli"
+  ],
   "bin": {
     "frameness": "bin/index.js"
   },
@@ -10,7 +30,6 @@
     "src",
     "template"
   ],
-  "description": "AI 에이전트 하네스 구조 초기화 도구",
   "engines": {
     "node": ">=18"
   }
