@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { installTemplate, writeClaudeAdapters } from '../commands/install.js';
+import {
+    installTemplate,
+    moveSkillsToClaude,
+    writeClaudeAdapters,
+} from '../commands/install.js';
 import { banner, select, confirm, closeUi, dim, bold } from './ui.js';
 
 async function startCli() {
@@ -39,16 +43,17 @@ async function startCli() {
         }
     }
 
-    // 스킬 정본은 .agents/skills/ 다 — Codex·Antigravity는 이 경로를 그대로 읽는다.
-    // Claude Code만 .claude/skills/ 를 보므로 쓰는 사람만 어댑터를 얹는다.
-    const withClaude = await confirm(
-        'Claude Code를 함께 쓰나요? (.claude/skills/ 어댑터 생성)',
-        true
-    );
+    // 스킬 경로가 도구마다 다르다 — 쓰는 도구의 자리에만 스킬을 둔다.
+    const tool = await select('사용하는 AI 코딩 도구', [
+        { label: 'Claude Code', hint: '.claude/skills/', value: 'claude' },
+        { label: 'Codex · Antigravity 등', hint: '.agents/skills/', value: 'agents' },
+        { label: '함께 사용', hint: '.agents/skills/ + 어댑터', value: 'both' },
+    ]);
 
     console.log('');
     if (!installTemplate(lang)) return;
-    if (withClaude) writeClaudeAdapters(lang);
+    if (tool === 'claude') moveSkillsToClaude();
+    if (tool === 'both') writeClaudeAdapters(lang);
 
     console.log('');
     console.log(` ${dim('다음 단계:')}`);

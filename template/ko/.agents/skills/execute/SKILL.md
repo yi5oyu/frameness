@@ -43,7 +43,7 @@ AGENTS.md `작업 절차` 2단계대로 계획 경로·파일·기준을 제시�
 
 Implementation Order 순서대로, 항목마다:
 
-- **tdd 규율 아래** (RED→GREEN — `.agents/skills/tdd/SKILL.md`)
+- **tdd 규율 아래** (RED→GREEN — `tdd` 스킬)
 - 첫 소스 변경 직전에 Status를 `[In Progress]`로 바꾼다
 - 변경마다 ep `## Change Log` 1줄을 **즉시** (절차 3단계)
 - 승인된 파일만 건드린다 — 실패를 계획 밖 파일로 보상하지 않는다. 다른 파일이

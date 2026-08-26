@@ -44,7 +44,7 @@ set Status to `[Approved]`.
 
 In Implementation Order, per item:
 
-- **under the tdd discipline** (RED→GREEN — `.agents/skills/tdd/SKILL.md`)
+- **under the tdd discipline** (RED→GREEN — the `tdd` skill)
 - set Status to `[In Progress]` right before the first source change
 - one ep `## Change Log` line **immediately** per change (procedure step 3)
 - approved files only — never compensate for a failure with a file outside the
