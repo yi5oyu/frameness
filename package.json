@@ -1,6 +1,6 @@
 {
   "name": "frameness",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "description": "AI 에이전트 하네스 구조 초기화 도구",
   "license": "MIT",
