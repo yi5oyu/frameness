@@ -3,11 +3,15 @@
 ## Procedure
 
 A plan (ep) = `docs/plans/active/ep-{YYYYMMDD}-{slug}.md` — created by copying
-`ep-0000-template.md`. **The plan file is the only state.** Anything inside
+`ep-0000-template.md`. **The plan file is the only state.**
+
+Create an ep only after a source change is agreed in conversation — never during
+questions, investigation, or discussion. Once it exists, anything inside
 `docs/plans/` is written without approval.
 
-1. **Plan** — read the relevant code first and scope the work, then fill the
-   template. `## Acceptance Criteria` must be decidable. If unclear, ask once.
+1. **Plan** — fill the template with what was agreed in conversation. Read the
+   relevant code; `## Acceptance Criteria` must be decidable. If unclear, ask in
+   conversation before the ep.
 2. **Approve** — present the plan path, files, and criteria, then wait.
    **No tool calls while waiting.** On approval, copy the files and criteria
    into `## Approval` and set Status to `[Approved]`.
