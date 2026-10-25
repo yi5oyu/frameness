@@ -20,7 +20,7 @@ questions, investigation, or discussion. Once it exists, anything inside
    append one `## Change Log` line immediately per change.
 4. **Verify** — check the criteria in `## Approval` one by one, tick them in
    `## Acceptance Criteria`, and present pass/fail together with a proposed
-   commit message. Human `lgtm`.
+   commit message. Human approval.
 5. **Close** — set Status to `[Done]`, move the file to `done/`, then commit
    (one-line subject + footer `ep: {slug}`).
 

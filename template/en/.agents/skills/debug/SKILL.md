@@ -24,10 +24,12 @@ When you meet a symptom, stop the fixing hand and enter this loop.
    - **During implementation** (a failure inside execute steps 4-5) → use this
      loop for root-cause tracing only; fix within the ep already in progress.
      Write the confirmed root-cause paragraph to that ep's `## Decisions` —
-     a Change Log line is too small to hold it. No new ep.
-   - **After close** (a bug found after `[Done]`) → create a new ep holding the
-     root-cause paragraph in `## Decisions` and the fix approach, and go to
-     AGENTS.md `Procedure` step 2.
+     a Change Log line is too small to hold it. Files found while tracing go
+     into that ep's `## Context Files`. No new ep.
+   - **After close** (a bug found after `[Done]`) → present the root-cause
+     paragraph and the fix approach. Once agreed, create a new ep holding the
+     paragraph in `## Decisions` and the files found while tracing in
+     `## Context Files`, and go to AGENTS.md `Procedure` step 2.
 
    Investigation itself needs no ep — only the fix does.
 6. **Lock:** turn the reproduction command from step 1 into a regression test and

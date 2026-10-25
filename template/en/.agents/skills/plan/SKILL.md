@@ -23,7 +23,8 @@ point to `setup` and stop — a plan made before the stack is settled cannot be 
    **and the rejected option with its reason** in `## Decisions` — the rejected
    option is what a later reader cannot recover. Decisions that persist
    project-wide (stack, conventions, commands) go to the nearest AGENTS.md,
-   not into the ep.
+   not into the ep. Files opened during investigation that the work needs go
+   into `## Context Files`.
 5. Report the ep path and **point to `execute`, then stop.**
    Do not request approval here — execute collects it and records `## Approval`.
    The point is to keep approval in one place.

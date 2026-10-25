@@ -28,6 +28,20 @@
      Test files for an approved source file count as approved — do not list them. -->
 - src/example.ts
 
+## Context Files
+
+<!-- Files not changed but needed for this work. Not subject to approval — add
+     each one as soon as it is found. Trace from Affected Files: 1-hop imports ·
+     tests · callers of the public functions and types being changed. Only files
+     opened and judged necessary, each with a one-line reason. Paths are hints —
+     search again only when one no longer matches.
+     Keep in step with Affected Files — trace a new file the same way and add
+     what it needs; a file that turns out to need changes moves to Affected Files
+     (re-approval).
+
+     - src/auth/session.ts — session creation called by login; check its return shape
+-->
+
 ## Acceptance Criteria
 
 <!-- Concrete, human-verifiable conditions. Once checked, leave the evidence

@@ -25,8 +25,8 @@ with its folder.
 
 - Different commands → must split
 - Same commands → do not split; layering belongs in that file's `## Structure`
-
-A single stack means one `src/` — the root is the contract, so nothing goes there.
+- A single stack means one `src/AGENTS.md` — the root is the contract, so facts
+  do not go there
 
 ## 3. Interview — one question at a time, each with a recommendation
 

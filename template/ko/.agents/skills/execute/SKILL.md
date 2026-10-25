@@ -19,9 +19,13 @@ disable-model-invocation: true
   비어 있으면 **추측해서 실행하지 않는다** — `setup`을 요청하거나 사람에게
   확인받아 그 AGENTS.md에 기록한 뒤 진행한다.
 
-## 1. 조사 (읽기 전용)
+## 1. 조사 (소스는 읽기만)
 
-Affected File마다: 파일을 읽고 → 1홉 import 의존을 확인하고 → 그 테스트를 찾는다.
+`## Context Files`가 있으면 거기서 시작한다 — 경로가 맞지 않을 때만 다시 찾는다.
+
+Affected File마다: 파일을 읽고 → 1홉 import 의존을 확인하고 → 그 테스트를 찾고
+→ 바꾸는 공개 함수·타입의 호출처를 찾는다. 찾은 파일은 즉시 `## Context Files`에
+이유 한 줄과 함께 더한다.
 위험 신호(전역 상태 · 공개 API 변경 · 마이그레이션 · 인증/보안)가 있으면 ep에
 `## Risk`를 채우고 이유를 적는다. 계획에 없던 파일이 필요해지면 이유와 함께
 Affected Files에 추가한다 — 승인은 다음 단계에서 한 번에 받는다.
@@ -46,6 +50,7 @@ Implementation Order 순서대로, 항목마다:
 - **tdd 규율 아래** (RED→GREEN — `tdd` 스킬)
 - 첫 소스 변경 직전에 Status를 `[In Progress]`로 바꾼다
 - 변경마다 ep `## Change Log` 1줄을 **즉시** (절차 3단계)
+- 조사에서 찾지 못한 파일을 열게 되면 `## Context Files`에 1줄
 - 승인된 파일만 건드린다 — 실패를 계획 밖 파일로 보상하지 않는다. 다른 파일이
   필요하면 추가하고 재승인부터 받는다.
 
@@ -73,7 +78,7 @@ Risk가 있거나 파일을 4개 이상 고쳤으면 독립 리뷰를 권한다 
 
 ## 6. 완료
 
-사람 `lgtm` → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/`으로 이동
+사람 승인 → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/`으로 이동
 → 커밋). Run History 줄에 검증 결과를 함께 적는다.
 
 **끝났다고 볼 때:** 단계마다의 산출물이 ep에 있고, 중단·실패를 포함해 Run History

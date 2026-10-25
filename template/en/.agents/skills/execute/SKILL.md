@@ -19,13 +19,18 @@ Input: one `docs/plans/active/ep-*.md`.
   `## Commands`, or it is empty, **do not guess and run** — ask for `setup`,
   or confirm with the human and record it in that AGENTS.md first.
 
-## 1. Investigate (read-only)
+## 1. Investigate (source read-only)
+
+If `## Context Files` has entries, start there — search again only when a path
+no longer matches.
 
 For each Affected File: read it → check 1-hop import dependencies → find its
-tests. On risk signals (global state · public API change · migration ·
-auth/security), fill in the ep's `## Risk` with reasons. If a file missing from
-the plan turns out to be needed, add it to Affected Files with the reason —
-approval is collected once at the next step.
+tests → find callers of the public functions and types being changed. Add each
+file found to `## Context Files` right away, with a one-line reason. On risk
+signals (global state · public API change · migration · auth/security), fill in
+the ep's `## Risk` with reasons. If a file missing from the plan turns out to be
+needed, add it to Affected Files with the reason — approval is collected once at
+the next step.
 
 ## 2. Order
 
@@ -47,6 +52,7 @@ In Implementation Order, per item:
 - **under the tdd discipline** (RED→GREEN — the `tdd` skill)
 - set Status to `[In Progress]` right before the first source change
 - one ep `## Change Log` line **immediately** per change (procedure step 3)
+- opening a file the investigation did not find → one `## Context Files` line
 - approved files only — never compensate for a failure with a file outside the
   plan. If another file is needed, add it and re-approve first.
 
@@ -78,7 +84,7 @@ session, ideally a different model than the implementer** — `review ep-{slug}`
 
 ## 6. Close
 
-Human `lgtm` → procedure step 5 (one Run History line → Status `[Done]` → move
+Human approval → procedure step 5 (one Run History line → Status `[Done]` → move
 to `done/` → commit). Include the verification result in the Run History line.
 
 **Done when:** every step's artifact exists in the ep and — including
