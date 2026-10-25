@@ -10,7 +10,7 @@ When you meet a symptom, stop the fixing hand and enter this loop.
 1. **Reproduce (pin the red):** make the failure reproducible with **one
    command** — change nothing until a command exists that reliably fails on this
    bug. If intermittent, run it repeatedly and record the failure rate. Use
-   `## Commands` from that folder's AGENTS.md.
+   `## Commands` from the nearest AGENTS.md.
 2. **Minimize:** shrink inputs and conditions to the smallest reproduction that
    still fails.
 3. **Hypothesis → verify (one at a time):** state "it's because X", plant an

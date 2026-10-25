@@ -22,6 +22,35 @@ export function installTemplate(lang = 'en') {
     }
 }
 
+// 사실(명령어·구조·금지)을 루트 AGENTS.md 하나에 둘지 폴더별로 둘지 고른다.
+// 두 방식은 루트 AGENTS.md의 규칙 한 줄만 다르다 — 스킬은 "가장 가까운
+// AGENTS.md"를 읽으므로 어느 쪽이든 그대로 동작한다. 템플릿은 기본값인
+// single 판으로 완결돼 있고, nested를 고르면 그 한 줄만 template/facts/ 의
+// 문장으로 바꾼다. single.md는 템플릿의 그 줄과 글자 그대로 같아야 한다.
+export function applyFactsLayout(lang = 'en', layout = 'single') {
+    if (layout === 'single') {
+        console.log(` ${green('✓')} 사실 위치 ${dim('(루트 AGENTS.md 하나)')}`);
+        return true;
+    }
+
+    const factsDir = path.join(__dirname, '../../template/facts', lang);
+    const target = path.join(process.cwd(), 'AGENTS.md');
+
+    try {
+        const from = fs.readFileSync(path.join(factsDir, 'single.md'), 'utf8');
+        const to = fs.readFileSync(path.join(factsDir, `${layout}.md`), 'utf8');
+        const text = fs.readFileSync(target, 'utf8');
+        // 템플릿과 조각이 어긋나면 조용히 넘어가지 않는다 — 규칙이 틀린 채 깔린다.
+        if (!text.includes(from)) throw new Error(`template/facts/${lang}/single.md 가 AGENTS.md와 다릅니다`);
+        fs.writeFileSync(target, text.replace(from, to), 'utf8');
+        console.log(` ${green('✓')} 사실 위치 ${dim('(폴더별 AGENTS.md)')}`);
+        return true;
+    } catch (err) {
+        console.error(` ${red('✗')} 규칙 변경 오류: ${err.message}`);
+        return false;
+    }
+}
+
 // 스킬 경로는 도구마다 다르다. Codex·Antigravity는 .agents/skills/ 를 프로젝트
 // 스킬 경로로 읽지만, Claude Code는 .claude/skills/ 만 읽는다. 템플릿은 언제나
 // .agents/ 로 풀린 뒤, 아래 두 함수가 고른 도구에 맞게 자리를 잡는다.

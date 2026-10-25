@@ -6,12 +6,12 @@ disable-model-invocation: true
 
 # plan — forging a plan by interview
 
-If the target folder has no AGENTS.md, or its `## Commands` is empty, point to
-`setup` and stop — a plan made before the stack is settled cannot be verified.
+If the target folder's nearest AGENTS.md has no `## Commands`, or it is empty,
+point to `setup` and stop — a plan made before the stack is settled cannot be verified.
 
 1. **Investigate first.** Facts (codebase, stack, existing patterns) are looked
-   up directly, never asked. Read the AGENTS.md of every folder the candidate
-   Affected Files span — its `## Forbidden` changes the plan.
+   up directly, never asked. Read the nearest AGENTS.md of each candidate
+   Affected File — its `## Forbidden` changes the plan.
 2. **One question at a time.** Bundled questions blur the answers. Attach a
    recommendation to each. Only **decisions** (goals, scope, trade-offs) belong
    to the user.
@@ -22,7 +22,7 @@ If the target folder has no AGENTS.md, or its `## Commands` is empty, point to
    decidable sentence. When a question offered a trade-off, record the choice
    **and the rejected option with its reason** in `## Decisions` — the rejected
    option is what a later reader cannot recover. Decisions that persist
-   project-wide (stack, conventions, commands) go to that folder's AGENTS.md,
+   project-wide (stack, conventions, commands) go to the nearest AGENTS.md,
    not into the ep.
 5. Report the ep path and **point to `execute`, then stop.**
    Do not request approval here — execute collects it and records `## Approval`.

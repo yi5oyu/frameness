@@ -15,9 +15,9 @@ Input: one `docs/plans/active/ep-*.md`.
   `[In Progress]` → a previous session was interrupted. Roll back to `[Draft]`
   with one Change Log line saying why, then restart ·
   `[Done]` → completed plans are never re-run; stop.
-- Read the AGENTS.md of every folder the Affected Files span. If the file is
-  missing or `## Commands` is empty, **do not guess and run** — ask for `setup`,
-  or confirm with the human and record it in that folder's AGENTS.md first.
+- Read the nearest AGENTS.md of each Affected File. If it has no
+  `## Commands`, or it is empty, **do not guess and run** — ask for `setup`,
+  or confirm with the human and record it in that AGENTS.md first.
 
 ## 1. Investigate (read-only)
 
@@ -51,7 +51,7 @@ In Implementation Order, per item:
   plan. If another file is needed, add it and re-approve first.
 
 If the commands were `(unverified)`, the first RED run is the verification —
-if it runs properly, drop the marker from that folder's AGENTS.md; if it does
+if it runs properly, drop the marker from that AGENTS.md; if it does
 not, stop and confirm with the human.
 
 ## 5. Verify

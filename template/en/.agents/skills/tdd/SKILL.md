@@ -20,7 +20,7 @@ only after everything is green.
    pre-building for the next test — exactly enough to turn this red green.
 3. Repeat — one slice at a time: one test → one implementation.
 
-Use `## Commands` from that folder's AGENTS.md to run. Never guess.
+Use `## Commands` from the nearest AGENTS.md to run. Never guess.
 
 ## seam — where tests go
 

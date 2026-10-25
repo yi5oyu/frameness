@@ -18,7 +18,8 @@ logic — that is why this skill is separate.
 - the ep's **Purpose · Acceptance Criteria · Affected Files**
 - **the diff** — if already committed, find the commit by its `ep: {slug}`
   trailer and read that diff; otherwise `git diff`
-- the root AGENTS.md rules, and `## Forbidden` of every folder the change spans
+- the root AGENTS.md rules, and `## Forbidden` of the nearest AGENTS.md of
+  each changed file
 
 Do **not** read the Change Log's why-notes or the implementing session's
 self-assessment — judge from the claims (plan) and the raw material (diff) alone.
@@ -38,8 +39,8 @@ self-assessment — judge from the claims (plan) and the raw material (diff) alo
 **No fixing.** On `NEEDS_REVISION`, the fix goes into a **new ep** — the original
 stays `[Done]` with `## Review` as the grounds.
 
-If the same finding keeps recurring, propose promoting it to that folder's
-AGENTS.md `## Forbidden`.
+If the same finding keeps recurring, propose promoting it to the nearest
+AGENTS.md's `## Forbidden`.
 
 **Done when:** `## Review` exists in the ep · every finding has `file:line`
 grounds · one Run History line.
