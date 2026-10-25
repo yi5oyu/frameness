@@ -2,7 +2,7 @@
 
 AI 에이전트가 코드를 수정하기 전에 **사람이 무엇을 왜 바꾸는지 승인**하게 하고 모든 계획, 승인, 검증, 의사결정 과정을 계획 파일에 기록해 세션이 끊겨도 **재현 가능하고 추적 가능한 개발 프로세스**를 만드는 것을 목표로 합니다.
 
-[하네스 설계와 구조](./HARNESS.md)
+> [하네스 설계와 구조(HARNESS.md)](./HARNESS.md)
 
 ## 계획 파일 (ep)
 
@@ -13,6 +13,15 @@ AI 에이전트가 코드를 수정하기 전에 **사람이 무엇을 왜 바�
 docs/plans/active/ep-{YYYYMMDD}-{slug}.md
 docs/plans/done/ep-{YYYYMMDD}-{slug}.md
 ```
+
+### 내용
+
+| 주제 | 섹션 | 담는 것 |
+| --- | --- | --- |
+| 왜 | Purpose · Decisions | 변경 이유, 택한 것과 버린 대안 |
+| 범위 | Affected Files · Context Files | 고칠 파일(승인 대상), 고치지 않지만 봐야 할 연관된 파일 |
+| 완료 기준 | Acceptance Criteria · Risk | 판정 가능한 기준과 확인 근거, 위험 |
+| 실행 기록 | Implementation Order · Approval · Change Log · Review · Run History | 작업 순서, 승인 사본, 변경마다 한 줄, 리뷰 판정, 실행 결과 |
 
 ## 설치
 
@@ -27,9 +36,32 @@ root/
 └── docs/plans/
 ```
 
+### 옵션
+
+| 질문 | 선택지 | 결과 |
+| --- | --- | --- |
+| 템플릿 언어 | **English** (기본) · 한국어 | 설치되는 규칙·스킬·문서의 언어. ep 섹션명과 Status 레이블은 두 언어 모두 영어 |
+| 사용하는 AI 코딩 도구 | **Claude Code** · Codex·Antigravity 등 · 함께 사용 | 도구가 스킬을 읽는 위치에 스킬을 둔다 |
+| 프로젝트 형태 | **루트 AGENTS.md 하나** (기본) · 폴더별 AGENTS.md | 명령어·구조·금지를 루트에 모두 적을지, 하위 프로젝트 폴더마다 AGENTS.md를 둘지 |
+
+이미 `AGENTS.md`나 `CLAUDE.md`가 있으면 덮어쓸지 먼저 묻습니다. 기본은 덮어쓰지 않고 설치를 건너뜁니다.
+
+**도구별 설치 결과**
+
+| 도구 | 스킬 위치 | 진입점 |
+| --- | --- | --- |
+| Claude Code | `.claude/skills/` | `CLAUDE.md` |
+| Codex·Antigravity 등 | `.agents/skills/` | `AGENTS.md`, `.agents/rules/global.md` |
+| 함께 사용 | `.agents/skills/` + `.claude/skills/` (포인터) | 위 둘 모두 |
+
+> [!NOTE]
+> 중첩 AGENTS.md
+>
+> 프로젝트 형태에 따라 프론트엔드·백엔드처럼 스택이 갈릴 때 빌드·테스트 명령이 다른 폴더마다 AGENTS.md 생성
+
 ### 실행
 
-1. `setup` 스킬을 사용해 스택과 폴더 구조를 정하고 폴더별 중첩 AGENTS.md를 만든다.
+`setup` 스킬을 사용해 스택과 폴더 구조를 정하고 설치 때 고른 프로젝트 형태대로 명령어·구조를 기록한다.
 
 ```
 root/
@@ -42,9 +74,11 @@ root/
     └── AGENTS.md 
 ```
 
-2. 프로젝트의 아키텍처마다 다른 기술 스택과 환경을 위한 하위 AGENTS.md를 생성합니다.
+**중첩 AGENTS.md**
 
-AGENTS.md 공식 가이드: [https://agents.md](https://agents.md/)
+프로젝트의 아키텍처마다 다른 기술 스택과 환경을 위한 하위 AGENTS.md를 생성합니다.
+
+> [AGENTS.md 공식 가이드](https://agents.md/)
 
 예시)
 

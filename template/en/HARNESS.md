@@ -1,50 +1,34 @@
 # HARNESS.md
 
-Frameness makes a human approve **what changes and why** before an AI agent
-touches the code, and records every plan, approval, verification, and decision
-in a plan file — so that even when a session drops, the development process
-stays **reproducible and traceable**.
+Frameness makes a human approve **what changes and why** before an AI agent modifies the code, and records every plan, approval, verification, and decision in a plan file — aiming for a development process that stays **reproducible and traceable** even when a session drops.
 
 ## What problem, and how it was solved
 
-### 1. The cost of adopting a harness
+### 1. The problem with existing harnesses
 
-Bringing an existing harness into your own project costs time: you have to
-understand it, analyze it, and rework its procedure to fit your project.
+Applying a harness to your own project takes time: you have to understand the process, analyze it, and rework its procedure to fit your project.
 
 **A human has to be able to read it and maintain it.**
 
-Using **"does this sentence change the agent's behavior?"** as the test, the
-harness was built as a small structure — a short AGENTS.md and six skills —
-so that it can be customized per project and kept in shape by a person.
+Using **"does this sentence change the agent's behavior?"** as the test, the harness was designed as a small structure — a short AGENTS.md and six skills — so it can be customized per project and maintained by a person.
 
-### 2. State
+### 2. State management
 
-With an AI agent, development revolves around conversation sessions. What
-changed and why, the current progress, the context — all of it is easy to lose,
-and hard to pick back up.
+With an AI agent, development revolves around conversation sessions, so what changed and why, the current progress, and the context are easy to lose and hard to pick back up.
 
 **State lives only in the plan file.**
 
-Plans, approvals, verification results, and decisions all accumulate in one
-file, so when a session drops or the model changes, that file alone is enough
-to recover the context and carry the work on. The steps taken and the work done
-also remain in a form a human can check — the goal is a document that stays
-reproducible and traceable after the work is finished.
+Plans, approvals, verification results, and decisions all accumulate in one file, so whether a session drops or the model changes, that file alone is enough to recover the context and carry the work on. The steps taken and the work done also remain in a form a human can check — the goal is a document that stays reproducible and traceable after the work is finished.
 
-## Structure and pipeline
+## Harness structure and pipeline
 
 ### Key files
 
 ```
 root
 ├── AGENTS.md                    - core rules
-├── CLAUDE.md                    - Claude Code entry point → AGENTS.md
-├── HARNESS.md                   - this document, design rationale
-├── .agents/
-│   ├── rules/global.md          - Antigravity entry point → AGENTS.md
-│   └── skills/                  - skills
-│       └── ...
+├── .agents/skills/              - skills
+│   └── ...
 └── docs/plans/
     ├── ep-0000-template.md      - plan template
     └── active/  done/
@@ -57,32 +41,22 @@ root
     │                           │               │
     ▼                           ▼               ▼
   [Plan] ──▶ [Approve] ──▶ [Implement] ──▶ [Verify] ──▶ [Close]
-    └───────────────────── execute ──────────────────────┘
-                 ▲                                    ▲
-          human approval                       human approval
+               └──────────────── execute ─────────────────┘
+               ▲                                          ▲
+        human approval                             human approval
 ```
-
-- `setup` runs once before the first plan — it settles the stack, so it sits
-  outside this loop.
-- `review` is optional and comes after **Verify**, in a fresh session.
 
 ## AGENTS.md design principles
 
 Official AGENTS.md guide: [https://agents.md](https://agents.md/)
 
-This file is always injected into the agent's context, so every sentence in it
-has to earn its place: if a sentence does not change the agent's behavior, it
-was treated as noise and deleted.
+This file is always injected into the agent's context, so if a sentence in AGENTS.md does not change the agent's behavior, it was treated as unnecessary and deleted.
 
-> The following are entry points for other AI agents. They carry no rules of
-> their own — they only point to AGENTS.md.
-> CLAUDE.md
-> .agents/rules/global.md
+> CLAUDE.md and .agents/rules/global.md are tool-specific entry points, set up to point to AGENTS.md, which holds the core rules.
 
 ### Nested AGENTS.md
 
-Create a sub-AGENTS.md for each part of the project that has its own stack and
-environment.
+If you choose "per-folder AGENTS.md" at install, a sub-AGENTS.md is created for each part of the project that has its own stack and environment. The default is to record everything in a single root AGENTS.md.
 
 `folder layout`
 
@@ -118,41 +92,45 @@ root
 
 ## Skills
 
-Only the skills essential to the flow are defined. More can be added as the
-project needs them.
+Only the skills essential to the flow are defined. More can be added as the project needs them.
 
-An agent can invoke a skill on its own and step around the procedure, so the
-skills meant to be called by a human are marked `disable-model-invocation: true`
-to keep the model from calling them.
+An agent can run a skill on its own and step around the procedure, so the skills meant to be called by a human are set to `disable-model-invocation: true` to keep the model from calling them.
 
 > `disable-model-invocation` may be ignored by tools other than Claude Code.
-> `execute` stops when there is no plan, and `tdd` routes back to the procedure
-> when approval has not been given yet.
+> `execute` stops when there is no plan, and `tdd` routes back to the procedure before approval.
 
 `human-invoked`
 
-- setup — settles the project's direction and stack through an interview and
-  writes a per-folder AGENTS.md. No source is changed, so no ep is created.
-  Once right after install; again when a new stack folder is added.
+- setup — plans the project's domain on first run. Records facts (commands, structure) per the chosen layout
 - plan — writes a plan file (ep) through an interview
 - execute — implements the plan file
-- review — compares the approved plan against the actual implementation.
-  Advised when Risk exists or 4+ files changed; run it in a fresh session,
-  ideally on a different model than the implementer.
+- review — after `execute`, compares the approved plan against the actual implementation (a fresh session is advised)
 
 `model-invoked`
 
-- tdd — runs in execute's implementation step, only inside an approved plan;
-  before approval it routes back to the procedure.
-- debug — runs after a test failure when the cause is unclear. A bug found
-  after the plan is closed gets a new plan file first, then a fix.
+- tdd — runs in `execute`'s implementation step, only inside an approved plan; before approval it routes back to the procedure.
+- debug — runs after a test failure when the cause is unclear. A bug found after the plan is closed gets a new plan file first, then a fix
 
 ## The plan file (ep)
 
-One plan file per goal, with every step of the run recorded in it, so that a
-dropped session or a changed model does not stop the work — the file and the
-code are enough to take it over. Once the work is done, the file remains as the
-document that explains where this code came from and why it was built this way.
+One plan file per goal, with every step of the run recorded in it. Whether a session drops or the model changes, the file and the code are enough to take the work over, and once the work is done the file remains as the document that explains where this code came from and why it was built this way.
+
+| Section | Holds | Filled by |
+| --- | --- | --- |
+| Status | `[Draft]` → `[Approved]` → `[In Progress]` → `[Done]` | each step |
+| Purpose | why the change, and what to look at to confirm it works | plan |
+| Decisions | the choice, the rejected option, and why it was rejected | plan, debug |
+| Affected Files | files to change | plan, execute |
+| Context Files | files not changed but needed | plan, execute, debug |
+| Acceptance Criteria | decidable completion criteria and their evidence | plan, execute |
+| Risk | risk signals such as global state · public API · migration · auth | execute |
+| Implementation Order | work order per file | execute |
+| Approval | a copy of the approved files and criteria | execute |
+| Change Log | one line per change | execute |
+| Review | the independent review's verdict and findings | review |
+| Run History | one line at every run end (done, aborted, or failed) | plan, execute, debug, review |
+
+`Approval`·`Change Log`·`Run History` are append-only — past lines are never edited to match reality. Every other section is updated in place.
 
 `template`
 
@@ -186,6 +164,20 @@ document that explains where this code came from and why it was built this way.
      Source files not listed here cannot be edited — add them and re-approve first.
      Test files for an approved source file count as approved — do not list them. -->
 - src/example.ts
+
+## Context Files
+
+<!-- Files not changed but needed for this work. Not subject to approval — add
+     each one as soon as it is found. Trace from Affected Files: 1-hop imports ·
+     tests · callers of the public functions and types being changed. Only files
+     opened and judged necessary, each with a one-line reason. Paths are hints —
+     search again only when one no longer matches.
+     Keep in step with Affected Files — trace a new file the same way and add
+     what it needs; a file that turns out to need changes moves to Affected Files
+     (re-approval).
+
+     - src/auth/session.ts — session creation called by login; check its return shape
+-->
 
 ## Acceptance Criteria
 

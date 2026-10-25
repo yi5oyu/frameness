@@ -8,7 +8,7 @@ Frameness는 AI 에이전트가 코드를 수정하기 전에 **사람이 무엇
 
 내 프로젝트에 하네스를 적용하기 위해 프로세스를 이해하고 분석하고 절차를 내 프로젝트에 맞게 수정하는 시간이 발생합니다.
 
-**사람이 읽고 관리할 수 있어야 한다.** 
+**사람이 읽고 관리할 수 있어야 한다.**
 
 **이 문장이 에이전트의 행동을 바꾸는가?** 를 기준으로 작은 크기의 AGENTS.md, 6개의 스킬로 이루어진 작은 구조로 설계해 프로젝트에 맞게 커스텀 가능하고 사람이 관리할 수 있는 하네스를 구축했습니다.
 
@@ -28,7 +28,7 @@ AI 에이전트를 사용하면 개발은 대화 세션을 중심으로 진행�
 root
 ├── AGENTS.md                    - 핵심 규칙
 ├── .agents/skills/              - 스킬
-│   └── ...                     
+│   └── ...
 └── docs/plans/
     ├── ep-0000-template.md      - 계획 템플릿
     └── active/  done/
@@ -52,11 +52,11 @@ AGENTS.md 공식 가이드: [https://agents.md](https://agents.md/)
 
 AI 에이전트가 컨텍스트에 항상 삽입되는 파일이므로 AGENTS.md에 적히는 문장이 에이전트의 행동을 바꾸는지 그렇지 않다면 불필요한 문장으로 생각하고 삭제했습니다.
 
-> CLAUDE.md, .agents/rules/global.md는 도구별 전용 설정 파일로, 핵심 규칙이 담긴 AGENTS.md를 진입점으로 가리키도록 설정했습니다.   
+> CLAUDE.md, .agents/rules/global.md는 도구별 전용 설정 파일로, 핵심 규칙이 담긴 AGENTS.md를 진입점으로 가리키도록 설정했습니다.
 
 ### 중첩 AGENTS.md
 
-프로젝트의 아키텍처마다 다른 기술 스택과 환경을 위한 하위 AGENTS.md를 생성합니다.
+설치할 때 "폴더별 AGENTS.md"를 고르면, 프로젝트의 아키텍처마다 다른 기술 스택과 환경을 위한 하위 AGENTS.md를 생성합니다. 기본값은 루트 AGENTS.md 하나에 모두 적는 방식입니다.
 
 `폴더 구조`
 
@@ -65,10 +65,10 @@ root
 ├── AGENTS.md
 ├── .agents/skills/
 ├── docs/plans/
-├── frontend         
-│   └── AGENTS.md 
+├── frontend
+│   └── AGENTS.md
 └── backend
-    └── AGENTS.md 
+    └── AGENTS.md
 ```
 
 `예시`
@@ -96,12 +96,12 @@ root
 
 AI 에이전트가 임의로 스킬을 실행해 절차를 무시할 수 있기 때문에 사람이 부르는 스킬은 `disable-model-invocation: true`로 설정해 모델이 호출하지 못하게 막았습니다.
 
-> `disable-model-invocation`은 Claude Code 이외의 다른 도구에서는 무시될 수 있습니다.      
+> `disable-model-invocation`은 Claude Code 이외의 다른 도구에서는 무시될 수 있습니다.
 > `execute`는 계획이 없으면 멈추고, `tdd`는 승인 전이면 절차로 되돌립니다.
 
 `사용자 호출`
 
-- setup — 최초 실행 시 전체 프로젝트 도메인 계획 수립. 폴더별 AGENTS.md 생성
+- setup — 최초 실행 시 전체 프로젝트 도메인 계획 수립. 고른 방식대로 사실(명령어·구조) 기록
 - plan — 인터뷰로 계획 파일(ep) 작성
 - execute — 계획 파일을 실제 구현
 - review — `execute` 구현 이후 승인된 계획과 실제 구현을 비교 검증(새 세션에서 실행 권장)
@@ -114,7 +114,24 @@ AI 에이전트가 임의로 스킬을 실행해 절차를 무시할 수 있기 
 
 ## 계획 파일(ep)
 
-하나의 목표를 위한 계획 파일을 작성하고 실행의 모든 과정을 그 파일에 기록해 세션이 끊기든 모델이 바뀌든 파일과 코드만으로 작업을 이어받을 수 있습니다. 완료된 뒤에는 이 코드가 어떤 과정에서 나왔고 무엇을 왜 그렇게 만들었는지 따라 판단할 수 있는 문서로 남습니다.
+하나의 목표마다 계획 파일을 하나 만들고 실행의 모든 단계를 그 파일에 기록합니다. 세션이 끊기든 모델이 바뀌든 파일과 코드만으로 작업을 이어받을 수 있고, 작업이 끝난 뒤에는 이 코드가 어디서 나왔고 왜 이렇게 만들었는지 설명하는 문서로 남습니다.
+
+| 섹션 | 담는 것 | 채우는 쪽 |
+| --- | --- | --- |
+| Status | `[Draft]` → `[Approved]` → `[In Progress]` → `[Done]` | 각 단계 |
+| Purpose | 왜 바꾸는가, 무엇을 보면 동작을 확인할 수 있는가 | plan |
+| Decisions | 택한 것과 버린 대안, 버린 이유 | plan, debug |
+| Affected Files | 고칠 파일 | plan, execute |
+| Context Files | 고치지 않지만 봐야 하는 파일 | plan, execute, debug |
+| Acceptance Criteria | 판정 가능한 완료 기준과 확인 근거 | plan, execute |
+| Risk | 전역 상태·공개 API·마이그레이션·인증 같은 위험 신호 | execute |
+| Implementation Order | 파일별 작업 순서 | execute |
+| Approval | 승인받은 파일과 기준의 사본 | execute |
+| Change Log | 변경마다 한 줄 | execute |
+| Review | 독립 리뷰 판정과 지적 | review |
+| Run History | 실행이 끝날 때마다 한 줄 (완료·중단·실패 모두) | plan, execute, debug, review |
+
+`Approval`·`Change Log`·`Run History`는 덧붙이기만 합니다. 지난 줄을 고쳐 현실에 맞추지 않습니다. 나머지 섹션은 제자리에서 갱신합니다.
 
 `템플릿`
 
@@ -146,6 +163,18 @@ AI 에이전트가 임의로 스킬을 실행해 절차를 무시할 수 있기 
      여기 없는 소스 파일은 고칠 수 없다 — 먼저 추가하고 재승인받는다.
      승인된 소스의 테스트 파일은 함께 승인된 것으로 본다 — 따로 적지 않는다. -->
 - src/example.ts
+
+## Context Files
+
+<!-- 고치지 않지만 이 작업에 필요한 파일. 승인 대상이 아니다 — 찾는 즉시 더한다.
+     Affected Files에서 출발해 import 1홉 · 테스트 · 바꾸는 공개 함수·타입의
+     호출처를 따라가 찾는다. 열어 보고 필요하다고 판단한 것만, 이유 한 줄과 함께.
+     경로는 힌트다 — 맞지 않을 때만 다시 찾는다.
+     Affected Files가 바뀌면 함께 맞춘다 — 새 파일은 같은 방식으로 추적해 더하고,
+     고치게 된 파일은 Affected Files로 옮긴다(재승인).
+
+     - src/auth/session.ts — login이 호출하는 세션 생성, 반환값 형태 확인
+-->
 
 ## Acceptance Criteria
 
