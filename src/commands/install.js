@@ -51,6 +51,32 @@ export function applyFactsLayout(lang = 'en', layout = 'single') {
     }
 }
 
+// git 전략을 고른다. 템플릿은 none 판(지금 브랜치에 커밋)으로 완결돼 있고,
+// 전략을 고르면 AGENTS.md 작업 절차 2~5단계만 template/git/{lang}/{strategy}.md
+// 로 바꾼다. none.md는 템플릿의 그 단락과 글자 그대로 같아야 한다.
+export function applyGitStrategy(lang = 'en', strategy = 'none') {
+    if (strategy === 'none') {
+        console.log(` ${green('✓')} git 전략 ${dim('(없음 · 지금 브랜치에 커밋)')}`);
+        return true;
+    }
+
+    const gitDir = path.join(__dirname, '../../template/git', lang);
+    const target = path.join(process.cwd(), 'AGENTS.md');
+
+    try {
+        const from = fs.readFileSync(path.join(gitDir, 'none.md'), 'utf8');
+        const to = fs.readFileSync(path.join(gitDir, `${strategy}.md`), 'utf8');
+        const text = fs.readFileSync(target, 'utf8');
+        if (!text.includes(from)) throw new Error(`template/git/${lang}/none.md 가 AGENTS.md와 다릅니다`);
+        fs.writeFileSync(target, text.replace(from, to), 'utf8');
+        console.log(` ${green('✓')} git 전략 ${dim(`(${strategy})`)}`);
+        return true;
+    } catch (err) {
+        console.error(` ${red('✗')} git 전략 적용 오류: ${err.message}`);
+        return false;
+    }
+}
+
 // 스킬 경로는 도구마다 다르다. Codex·Antigravity는 .agents/skills/ 를 프로젝트
 // 스킬 경로로 읽지만, Claude Code는 .claude/skills/ 만 읽는다. 템플릿은 언제나
 // .agents/ 로 풀린 뒤, 아래 두 함수가 고른 도구에 맞게 자리를 잡는다.

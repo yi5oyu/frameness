@@ -1,8 +1,11 @@
 # ep-{YYYYMMDD}-{slug}: {task name}
 
 **Status:** [Draft]
-<!-- Draft → Approved → In Progress → Done.
-     Always record the status before the change that produced it. -->
+**Branch:** {branch}
+<!-- Draft → Approved → In Progress → (In Review) → Done.
+     In Review only when a review is requested — NEEDS_REVISION goes back to In Progress.
+     Always record the status before the change that produced it.
+     Branch is the branch this ep is worked on — recorded right before the first source change. -->
 
 > You may be a stateless agent — do not rely on past conversation; write so
 > the work can be completed from this file and the codebase alone.
@@ -84,7 +87,11 @@
 
 ## Review
 
-<!-- Filled by the review skill. Optional.
+<!-- Filled by the review skill. Optional — if run, it runs before Done, and the
+     last verdict must be APPROVED for Done.
+     A re-review appends a new entry — the last entry is the one in force.
+
+     ### {ISO8601} — {reviewing model}
      verdict: APPROVED | NEEDS_REVISION
      - BLOCKER|WARNING|NOTE {file:line} — {what} -->
 

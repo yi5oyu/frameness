@@ -1,6 +1,6 @@
 ---
 name: execute
-description: ep 하나를 조사·순서·승인·구현·완료까지 한 세션에서 끌고 간다. 모든 산출물은 ep에 남는다.
+description: ep 하나를 조사·순서·승인·구현·검증·완료까지 끌고 간다. 독립 리뷰를 고르면 APPROVED 뒤에 완료한다. 모든 산출물은 ep에 남는다.
 disable-model-invocation: true
 ---
 
@@ -13,7 +13,11 @@ disable-model-invocation: true
 - ep가 없으면: 절차 1단계나 `plan` 스킬을 가리키고 멈춘다.
 - 레이블 확인: `[Draft]` → 진행(승인 필요) ·
   `[Approved]` → 진행 · `[In Progress]` → 이전 세션이 중단된 것이다.
-  `[Draft]`로 되돌리고 왜인지 Change Log 1줄을 남긴 뒤 다시 시작 ·
+  `## Review`의 마지막 판정이 `NEEDS_REVISION`이면 리뷰 수정 중에 끊긴 것이다 —
+  5단계의 수정으로 이어 간다. 아니면 `[Draft]`로 되돌리고 왜인지 Change Log 1줄을
+  남긴 뒤 다시 시작 ·
+  `[In Review]` → `## Review`의 마지막 판정을 본다: 없으면 새 세션의 review를
+  안내하고 멈춘다 · `NEEDS_REVISION`이면 5단계의 수정으로 · `APPROVED`면 6단계로 ·
   `[Done]` → 끝난 계획은 다시 돌리지 않는다. 멈춘다.
 - Affected File마다 가장 가까운 AGENTS.md를 읽는다. `## 명령어`가 없거나
   비어 있으면 **추측해서 실행하지 않는다** — `setup`을 요청하거나 사람에게
@@ -48,7 +52,8 @@ AGENTS.md `작업 절차` 2단계대로 계획 경로·파일·기준을 제시�
 Implementation Order 순서대로, 항목마다:
 
 - **tdd 규율 아래** (RED→GREEN — `tdd` 스킬)
-- 첫 소스 변경 직전에 Status를 `[In Progress]`로 바꾼다
+- 첫 소스 변경 직전에 절차 3단계대로 `**Branch:**`를 적고 Status를 `[In Progress]`로
+  바꾼다
 - 변경마다 ep `## Change Log` 1줄을 **즉시** (절차 3단계)
 - 조사에서 찾지 못한 파일을 열게 되면 `## Context Files`에 1줄
 - 승인된 파일만 건드린다 — 실패를 계획 밖 파일로 보상하지 않는다. 다른 파일이
@@ -73,12 +78,18 @@ red이면:
 green이면 기준마다 확인 근거를 `## Acceptance Criteria` 같은 줄에 적고 체크한다
 — 테스트 경로 또는 `수동 확인: {방법}`.
 
-Risk가 있거나 파일을 4개 이상 고쳤으면 독립 리뷰를 권한다 — **새 세션에서,
-되도록 구현자와 다른 모델로** `review ep-{slug}`.
+그다음 절차 4단계대로 통과·실패와 커밋 메시지 안을 제시한다. Risk가 있거나
+파일을 4개 이상 고쳤으면 독립 리뷰를 권한다 — **새 세션에서, 되도록 구현자와
+다른 모델로** `review ep-{slug}`. 사람이 리뷰를 고르면 Status를 `[In Review]`로
+바꾸고 Run History 1줄을 남긴 뒤 멈춘다 — 리뷰 판정 전에는 완료하지 않는다.
+
+`NEEDS_REVISION`이면 Status를 `[In Progress]`로 되돌리고 지적을 같은 ep 안에서
+고친다(변경마다 Change Log 1줄) → 다시 검증 → `[In Review]`. 고치는 데 Affected
+Files 밖 파일이 필요하면 추가하고 재승인부터 받는다.
 
 ## 6. 완료
 
-사람 승인 → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/`으로 이동
+사람 승인(리뷰했다면 `## Review`의 마지막 판정이 `APPROVED`인 뒤) → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/`으로 이동
 → 커밋). Run History 줄에 검증 결과를 함께 적는다.
 
 **끝났다고 볼 때:** 단계마다의 산출물이 ep에 있고, 중단·실패를 포함해 Run History

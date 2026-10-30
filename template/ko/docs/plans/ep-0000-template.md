@@ -1,8 +1,11 @@
 # ep-{YYYYMMDD}-{slug}: {작업 이름}
 
 **Status:** [Draft]
-<!-- Draft → Approved → In Progress → Done.
-     상태는 항상 그 상태를 만든 변경보다 먼저 기록한다. -->
+**Branch:** {branch}
+<!-- Draft → Approved → In Progress → (In Review) → Done.
+     In Review는 리뷰를 고른 경우만 — NEEDS_REVISION이면 In Progress로 돌아간다.
+     상태는 항상 그 상태를 만든 변경보다 먼저 기록한다.
+     Branch는 이 ep를 작업하는 브랜치 — 첫 소스 변경 직전에 적는다. -->
 
 > 당신은 상태가 없는 에이전트일 수 있다 — 지난 대화에 기대지 말고, 이 파일과
 > 코드베이스만으로 작업을 끝낼 수 있게 쓴다.
@@ -79,7 +82,11 @@
 
 ## Review
 
-<!-- review 스킬이 채운다. 선택.
+<!-- review 스킬이 채운다. 선택 — 하면 Done 전에 하고, 마지막 판정이 APPROVED여야
+     Done이 된다.
+     다시 리뷰하면 새 항목을 덧붙인다 — 마지막 항목이 유효하다.
+
+     ### {ISO8601} — {리뷰한 모델}
      verdict: APPROVED | NEEDS_REVISION
      - BLOCKER|WARNING|NOTE {file:line} — {내용} -->
 

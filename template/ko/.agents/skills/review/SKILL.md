@@ -12,11 +12,15 @@ disable-model-invocation: true
 "독립 리뷰는 깨끗한 새 세션에서 돌리세요."
 구현 맥락을 아는 리뷰어는 그 논리에 관대해진다 — 이 스킬이 따로 있는 이유다.
 
+ep Status가 `[In Review]`가 아니면 멈춘다 — 리뷰는 검증을 마친 ep를 완료 전에
+본다. `[Done]`인 ep는 리뷰하지 않는다 — 완료 뒤 발견한 문제는 `debug`를 거쳐 새
+ep로 고친다.
+
 ## 입력 (이것만 읽는다)
 
 - ep의 **Purpose · Acceptance Criteria · Affected Files**
-- **diff** — 이미 커밋됐으면 `ep: {slug}` 트레일러로 커밋을 찾아 그 diff,
-  아직이면 `git diff`
+- **diff** — 아직 커밋 전이다: `git diff HEAD`와, `git status --porcelain`에
+  `??`로 나오는 새 파일 (`docs/plans/` 제외)
 - 루트 AGENTS.md의 규칙과, 변경된 파일마다 가장 가까운 AGENTS.md의 `## 금지`
 
 Change Log의 사유 메모나 구현 세션의 자기 평가는 읽지 **않는다** — 주장(계획)과
@@ -29,12 +33,15 @@ Change Log의 사유 메모나 구현 세션의 자기 평가는 읽지 **않는
 3. 규칙 위반과 명백한 결함을 확인한다.
 4. 지적을 분류한다: **BLOCKER**(머지 불가 결함) / **WARNING**(위험) /
    **NOTE**(참고). 모든 지적에 `파일:줄` 근거를 단다.
-5. ep의 `## Review`를 채운다:
+5. ep의 `## Review`에 새 항목을 덧붙인다: `### {ISO8601} — {모델}` +
    `verdict: APPROVED | NEEDS_REVISION` (BLOCKER 0개면 APPROVED) + 지적들.
+   시각은 리뷰를 마친 때, 모델은 이 리뷰를 돌린 모델의 정확한 이름이다 — 모르면
+   추측하지 말고 `(unknown)`. 지난 항목은 고치지 않는다.
 6. ep `## Run History` 1줄.
 
-**고치지 않는다.** `NEEDS_REVISION`이면 수정은 **새 ep**로 간다 — 원 ep는
-`[Done]`인 채로 두고 `## Review`가 그 근거로 남는다.
+**고치지 않는다.** Status도 바꾸지 않고 커밋도 하지 않는다 — `## Review`는 ep의
+완료 커밋에 함께 실린다. `NEEDS_REVISION`이면 구현 쪽(`execute`)이 같은 ep에서
+고친 뒤 다시 리뷰를 받는다.
 
 같은 지적이 반복되면 가장 가까운 AGENTS.md의 `## 금지`에 올릴 것을 제안한다.
 

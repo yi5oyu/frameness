@@ -33,7 +33,8 @@ When you meet a symptom, stop the fixing hand and enter this loop.
 
    Investigation itself needs no ep — only the fix does.
 6. **Lock:** turn the reproduction command from step 1 into a regression test and
-   commit it with the fix — verify by execution that red turned green.
+   put it in the same ep as the fix — it is not committed separately but ships
+   in that ep's close commit. Verify by execution that red turned green.
 
 **3-strike rule:** if fixes for the same symptom fail 3 times, stop. Report to
 the human with the hypothesis/observation log: "possibly a structural problem,

@@ -3,6 +3,7 @@ import path from 'path';
 import {
     installTemplate,
     applyFactsLayout,
+    applyGitStrategy,
     moveSkillsToClaude,
     writeClaudeAdapters,
 } from '../commands/install.js';
@@ -58,9 +59,16 @@ async function startCli() {
         { label: '폴더별 AGENTS.md', hint: '하위 프로젝트마다 하나', value: 'nested' },
     ]);
 
+    // 첫 항목이 기본값이다 — 템플릿도 none 판으로 들어 있다.
+    const git = await select('git 전략', [
+        { label: '없음', hint: '지금 브랜치에 커밋 · 기본', value: 'none' },
+        { label: 'GitHub Flow', hint: '기능 브랜치 + PR', value: 'github-flow' },
+    ]);
+
     console.log('');
     if (!installTemplate(lang)) return;
     if (!applyFactsLayout(lang, layout)) return;
+    if (!applyGitStrategy(lang, git)) return;
     if (tool === 'claude') moveSkillsToClaude();
     if (tool === 'both') writeClaudeAdapters(lang);
 

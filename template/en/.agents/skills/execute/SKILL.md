@@ -1,6 +1,6 @@
 ---
 name: execute
-description: Take an ep from investigation through ordering, approval, implementation, and close in one session. Every artifact is recorded in the ep.
+description: Take an ep from investigation through ordering, approval, implementation, verification, and close. If an independent review is requested, close only after APPROVED. Every artifact is recorded in the ep.
 disable-model-invocation: true
 ---
 
@@ -12,8 +12,13 @@ Input: one `docs/plans/active/ep-*.md`.
 
 - No ep: point to procedure step 1 or the `plan` skill, then stop.
 - Label check: `[Draft]` → proceed (approval required) · `[Approved]` → proceed ·
-  `[In Progress]` → a previous session was interrupted. Roll back to `[Draft]`
-  with one Change Log line saying why, then restart ·
+  `[In Progress]` → a previous session was interrupted. If the last verdict in
+  `## Review` is `NEEDS_REVISION`, it was cut off while fixing a review —
+  continue the fix in step 5. Otherwise roll back to `[Draft]` with one Change
+  Log line saying why, then restart ·
+  `[In Review]` → check the last verdict in `## Review`: none → point to
+  `review` in a fresh session and stop · `NEEDS_REVISION` → the fix in step 5 ·
+  `APPROVED` → step 6 ·
   `[Done]` → completed plans are never re-run; stop.
 - Read the nearest AGENTS.md of each Affected File. If it has no
   `## Commands`, or it is empty, **do not guess and run** — ask for `setup`,
@@ -50,7 +55,8 @@ set Status to `[Approved]`.
 In Implementation Order, per item:
 
 - **under the tdd discipline** (RED→GREEN — the `tdd` skill)
-- set Status to `[In Progress]` right before the first source change
+- right before the first source change, record `**Branch:**` and set Status
+  to `[In Progress]` per procedure step 3
 - one ep `## Change Log` line **immediately** per change (procedure step 3)
 - opening a file the investigation did not find → one `## Context Files` line
 - approved files only — never compensate for a failure with a file outside the
@@ -79,12 +85,21 @@ If they must change, that is a re-approval.**
 If green, record the evidence on each criterion line in `## Acceptance Criteria`
 and tick it — a test path, or `manual: {how}`.
 
+Then present pass/fail and a proposed commit message per procedure step 4.
 If Risk exists or 4+ files changed, advise an independent review — **in a fresh
 session, ideally a different model than the implementer** — `review ep-{slug}`.
+If the human requests a review, set Status to `[In Review]`, append one Run
+History line, and stop — never close before the verdict.
+
+On `NEEDS_REVISION`, set Status back to `[In Progress]` and fix the findings
+within the same ep (one Change Log line per change) → verify again →
+`[In Review]`. If the fix needs a file outside Affected Files, add it and
+re-approve first.
 
 ## 6. Close
 
-Human approval → procedure step 5 (one Run History line → Status `[Done]` → move
+Human approval (if reviewed, after the last verdict in `## Review` is
+`APPROVED`) → procedure step 5 (one Run History line → Status `[Done]` → move
 to `done/` → commit). Include the verification result in the Run History line.
 
 **Done when:** every step's artifact exists in the ep and — including
