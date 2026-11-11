@@ -18,9 +18,10 @@
    session. On `APPROVED`, present again for approval; on `NEEDS_REVISION`, set
    it back to `[In Progress]`, fix within the same ep, and verify again.
 5. **Close** — if reviewed, only when the last verdict in `## Review` is
-   `APPROVED`. Set Status to `[Done]`, move the file to `done/`, then commit
-   only the files in the Change Log and this ep file, by path (one-line
-   subject + footer `ep: {slug}`), and push. Never rewrite pushed history.
+   `APPROVED`. Set Status to `[Done]`, move the file to `done/{branch}/`
+   (`**Branch:**` with `/` turned into `-`), then commit only the files in the
+   Change Log and this ep file, by path (one-line subject + footer
+   `ep: {slug}`), and push. Never rewrite pushed history.
    Do not open a PR — closing an ep is not finishing the feature.
 
 **PR** — outside the ep procedure. Open one only when the human says the

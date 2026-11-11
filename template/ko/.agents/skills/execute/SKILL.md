@@ -42,10 +42,9 @@ ep의 `## Implementation Order`를 채운다 — 항목마다
 
 ## 3. 승인
 
-AGENTS.md `작업 절차` 2단계대로 계획 경로·파일·기준을 제시하고 기다린다 —
-기다리는 동안 도구를 부르지 않는다. Risk가 있으면 요약에 포함한다.
-승인되면 합의된 파일과 기준을 옮겨 적어 `## Approval`에 덧붙이고 Status를
-`[Approved]`로 바꾼다.
+AGENTS.md `작업 절차` 2단계가 꼽는 것을 모두 제시하고 기다린다 — 기다리는
+동안 도구를 부르지 않는다. Risk가 있으면 요약에 포함한다. 승인되면 2단계가
+옮겨 적으라는 것을 `## Approval`에 덧붙이고 Status를 `[Approved]`로 바꾼다.
 
 ## 4. 구현
 
@@ -89,7 +88,7 @@ Files 밖 파일이 필요하면 추가하고 재승인부터 받는다.
 
 ## 6. 완료
 
-사람 승인(리뷰했다면 `## Review`의 마지막 판정이 `APPROVED`인 뒤) → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/`으로 이동
+사람 승인(리뷰했다면 `## Review`의 마지막 판정이 `APPROVED`인 뒤) → 절차 5단계 (Run History 1줄 → Status `[Done]` → `done/{branch}/`로 이동
 → 커밋). Run History 줄에 검증 결과를 함께 적는다.
 
 **끝났다고 볼 때:** 단계마다의 산출물이 ep에 있고, 중단·실패를 포함해 Run History

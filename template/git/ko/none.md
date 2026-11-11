@@ -11,5 +11,6 @@
    `APPROVED`면 다시 제시해 승인받고, `NEEDS_REVISION`이면 `[In Progress]`로
    되돌려 같은 ep에서 고치고 다시 검증한다.
 5. **완료** — 리뷰했다면 `## Review`의 마지막 판정이 `APPROVED`일 때만. Status를
-   `[Done]`으로 바꾸고 `done/`으로 옮긴 뒤, Change Log에 오른 파일과 이 ep 파일만
-   경로를 지정해 커밋 (제목 한 줄 + 푸터 `ep: {slug}`).
+   `[Done]`으로 바꾸고 `done/{branch}/`로 옮긴 뒤(`**Branch:**`의 `/`는 `-`로),
+   Change Log에 오른 파일과 이 ep 파일만 경로를 지정해 커밋 (제목 한 줄 + 푸터
+   `ep: {slug}`).

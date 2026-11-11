@@ -45,10 +45,10 @@ Cross-check against the acceptance criteria for missing files.
 
 ## 3. Approval
 
-Present the plan path, the files, and the criteria per AGENTS.md `Procedure`
-step 2, then wait — no tool calls while waiting. Include Risk in the summary if
-present. On approval, append the agreed files and criteria to `## Approval` and
-set Status to `[Approved]`.
+Present everything AGENTS.md `Procedure` step 2 lists, then wait — no tool
+calls while waiting. Include Risk in the summary if present. On approval,
+append what step 2 says to copy to `## Approval` and set Status to
+`[Approved]`.
 
 ## 4. Implement
 
@@ -100,7 +100,7 @@ re-approve first.
 
 Human approval (if reviewed, after the last verdict in `## Review` is
 `APPROVED`) → procedure step 5 (one Run History line → Status `[Done]` → move
-to `done/` → commit). Include the verification result in the Run History line.
+to `done/{branch}/` → commit). Include the verification result in the Run History line.
 
 **Done when:** every step's artifact exists in the ep and — including
 abort/failure — a Run History line exists. A run without a record is a run that

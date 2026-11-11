@@ -14,9 +14,10 @@
    `review`를 기다린다. `APPROVED`면 다시 제시해 승인받고, `NEEDS_REVISION`이면
    `[In Progress]`로 되돌려 같은 ep에서 고치고 다시 검증한다.
 5. **완료** — 리뷰했다면 `## Review`의 마지막 판정이 `APPROVED`일 때만. Status를
-   `[Done]`으로 바꾸고 `done/`으로 옮긴 뒤, Change Log에 오른 파일과 이 ep 파일만
-   경로를 지정해 커밋 (제목 한 줄 + 푸터 `ep: {slug}`)하고 push한다. push한 이력은
-   다시 쓰지 않는다. PR은 열지 않는다 — ep 완료는 기능 완료가 아니다.
+   `[Done]`으로 바꾸고 `done/{branch}/`로 옮긴 뒤(`**Branch:**`의 `/`는 `-`로),
+   Change Log에 오른 파일과 이 ep 파일만 경로를 지정해 커밋 (제목 한 줄 + 푸터
+   `ep: {slug}`)하고 push한다. push한 이력은 다시 쓰지 않는다.
+   PR은 열지 않는다 — ep 완료는 기능 완료가 아니다.
 
 **PR** — ep 절차 밖이다. 사람이 기능이 끝났다고 말할 때만 연다: 브랜치가 걸친
 폴더 전부의 `## 명령어`를 실행 → `git log {기본 브랜치}..{브랜치}`의 `ep:`
